@@ -6,61 +6,96 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'location_id' => 'required|exists:countries,id',
-        ]);
+  public function register(Request $request)
+{
+  $validated = $request->validate([
+      'role' => ['required', Rule::in(['professional', 'structure'])],
+      'email' => 'required|email|unique:users,email',
+      'password' => 'required|min:8|confirmed',
+      'country_id' => 'required|exists:countries,id',
 
-        $user = User::create([
-            ...$validated,
-            'password' => bcrypt($validated['password']),
-        ]);
+      // professional fields
+      'first_name' => 'required_if:role,professional',
+      'last_name' => 'required_if:role,professional',
+      'bio' => 'nullable|string',
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+      // structure fields
+      'company_name' => 'required_if:role,structure',
+      'sector' => 'required_if:role,structure',
+      'website' => 'nullable|url',
+      'temporary_structure_id' => 'nullable|exists:temporary_structures,id',
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
-    }
+      // optional image
+      'profile_picture' => 'nullable|image|max:2048',
+  ]);
+
+  $path = null;
+  if ($request->hasFile('profile_picture')) {
+      $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+  }
+
+  $user = User::create([
+      'role' => $validated['role'],
+      'email' => $validated['email'],
+      'password' => Hash::make($validated['password']),
+      'country_id' => $validated['country_id'],
+      'first_name' => $validated['first_name'] ?? null,
+      'last_name' => $validated['last_name'] ?? null,
+      'company_name' => $validated['company_name'] ?? null,
+      'sector' => $validated['sector'] ?? null,
+      'website' => $validated['website'] ?? null,
+      'bio' => $validated['bio'] ?? null,
+      'temporary_structure_id' => $validated['temporary_structure_id'] ?? null,
+      'profile_picture' => $path,
+      'is_verified' => false,
+  ]);
+
+  return response()->json([
+      'message' => 'Utilisateur enregistré avec succès.',
+      'user' => $user
+  ], 201);
+}
+
 
     public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid credentials.'],
-            ]);
+            return response()->json([
+                'message' => 'Identifiants invalides.'
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'message' => 'Connexion réussie.',
             'token' => $token,
+            'user' => $user
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out']);
+        return response()->json([
+            'message' => 'Déconnexion réussie.'
+        ]);
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
     }
 }

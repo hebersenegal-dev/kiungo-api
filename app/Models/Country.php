@@ -4,30 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Country extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'country_code',
-    ];
+    protected $fillable = ['name'];
 
-    /**
-     * Get the users associated with this country.
-     */
-    public function users(): HasMany
+    public function users()
     {
-        return $this->hasMany(User::class, 'location_id');
+        return $this->hasMany(User::class);
     }
 
-    /**
-     * Get the structures based in this country.
-     */
-    public function structures(): HasMany
+    public function temporaryStructures()
     {
-        return $this->hasMany(Structure::class);
+        return $this->hasMany(TemporaryStructure::class);
     }
 }
