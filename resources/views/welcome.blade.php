@@ -42,7 +42,7 @@
     <p>Developed by <strong>HeberSenegal</strong></p>
     <p>Version: <strong>v1.0</strong></p>
     <div class="api-docs">
-        <a href="/api">📘 View API Info</a>
+        <a href="/docs/api">📘 View API Info</a>
     </div>
 </body>
 </html>
