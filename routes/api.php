@@ -73,8 +73,8 @@ Route::prefix('temporary-structures')->middleware('auth:sanctum')->group(functio
     Route::get('/{id}', [TemporaryStructureController::class, 'show']);
 });
 
+Route::get('/countries', [CountryController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/countries', [CountryController::class, 'index']);
     Route::post('/countries', [CountryController::class, 'store']);
     Route::put('/countries/{id}', [CountryController::class, 'update']);
     Route::delete('/countries/{id}', [CountryController::class, 'destroy']);
