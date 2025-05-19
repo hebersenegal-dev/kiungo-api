@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
 class ProjectMergeController extends Controller
 {
     public function verify(Request $request, $tempProjectId)
@@ -37,7 +38,7 @@ class ProjectMergeController extends Controller
             return response()->json(['error' => 'La structure liée n’a pas encore été fusionnée.'], 400);
         }
 
-        // Création du projet officiel 
+        // Création du projet officiel
         $project = Project::create([
             'title' => $temp->title,
             'description' => $temp->description,

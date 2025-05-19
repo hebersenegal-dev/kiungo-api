@@ -82,5 +82,5 @@ class User extends Authenticatable
             : null;
     }
 
-    
+
 }

@@ -18,7 +18,7 @@ return new class extends Migration
       $table->string('company_name')->nullable();
       $table->string('email')->unique();
       $table->string('password');
-      $table->enum('role', ['professional', 'structure']);
+      $table->enum('role', ['professional', 'structure','admin']);
       $table->string('sector')->nullable();
       $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
       $table->string('website')->nullable();
