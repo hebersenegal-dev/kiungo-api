@@ -104,90 +104,80 @@ public function show($id)
     }
 
     public function storeWithTemporaries(Request $request)
-  {
-    $request->validate([
-    'structure_id' => 'nullable|exists:users,id',
-    'temp_structure_id' => 'nullable|exists:temporary_structures,id',
-]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'role' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
 
-if (!$request->structure_id && !$request->temp_structure_id) {
-    return response()->json(['error' => 'Either structure_id or temp_structure_id is required.'], 422);
-}
+            'structure_id' => 'nullable|exists:users,id',
+            'structure.name' => 'required_without:structure_id|string',
+            'structure.sector' => 'required_without:structure_id|string',
+            'structure.country_id' => 'required_without:structure_id|exists:countries,id',
+            'structure.website' => 'nullable|url',
 
-$validated = $request->validate([
-    'title' => 'required|string',
-    'role' => 'required|string',
-    'start_date' => 'required|date',
-    'end_date' => 'nullable|date|after_or_equal:start_date',
+            'project.title' => 'required|string',
+            'project.description' => 'nullable|string',
+            'project.country_id' => 'required|exists:countries,id',
+            'project.start_date' => 'required|date',
+            'project.end_date' => 'required|date|after_or_equal:project.start_date',
+            'project.website' => 'nullable|url',
+        ]);
 
-    'structure_id' => 'nullable|exists:users,id',
-    'structure.name' => 'required_without:structure_id|string',
-    'structure.sector' => 'required_without:structure_id|string',
-    'structure.country_id' => 'required_without:structure_id|exists:countries,id',
-    'structure.website' => 'nullable|url',
+        $structureId = $validated['structure_id'] ?? null;
+        $structureData = $validated['structure'] ?? null;
+        $projectData = $validated['project'];
 
-    'project.title' => 'required|string',
-    'project.description' => 'nullable|string',
-    'project.country_id' => 'required|exists:countries,id',
-    'project.start_date' => 'required|date',
-    'project.end_date' => 'required|date|after_or_equal:project.start_date',
-    'project.website' => 'nullable|url',
-]);
+        // Either use existing structure or create temp one
+        if ($structureId) {
+            $structure = User::where('role', 'structure')->findOrFail($structureId);
+            $tempStructure = null;
+        } else {
+            $tempStructure = TemporaryStructure::create([
+                'company_name' => $structureData['name'],
+                'sector' => $structureData['sector'],
+                'country_id' => $structureData['country_id'],
+                'website' => $structureData['website'] ?? null,
+                'added_by' => Auth::id(),
+                'is_verified' => false,
+            ]);
+            $structureId = null;
+        }
 
+        $tempProject = TemporaryProject::create([
+            'title' => $projectData['title'],
+            'description' => $projectData['description'] ?? null,
+            'country_id' => $projectData['country_id'],
+            'temp_structure_id' => $tempStructure->id ?? null,
+            'structure_id' => $structureId,
+            'start_date' => $projectData['start_date'],
+            'end_date' => $projectData['end_date'],
+            'website' => $projectData['website'] ?? null,
+            'project_image' => $request->file('project.project_image')?->store('project_images'),
+            'added_by' => Auth::id(),
+            'is_verified' => false,
+        ]);
 
-      $structureId = $validated['structure_id'] ?? null;
-      $structureData = $validated['structure'] ?? null;
-      $projectData = $validated['project'];
+        $experience = Experience::create([
+            'user_id' => Auth::id(),
+            'structure_id' => $structureId,
+            'temp_structure_id' => $tempStructure->id ?? null,
+            'temp_project_id' => $tempProject->id,
+            'title' => $validated['title'],
+            'role' => $validated['role'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'] ?? null,
+        ]);
 
-      // Either use existing structure_id or create temporary one
-      if ($structureId) {
-          $structure = User::where('role', 'structure')->findOrFail($structureId);
-          $tempStructure = null;
-      } else {
-          $tempStructure = TemporaryStructure::create([
-              'company_name' => $structureData['name'],
-              'sector' => $structureData['sector'],
-              'country_id' => $structureData['country_id'],
-              'website' => $structureData['website'] ?? null,
-              'added_by' => Auth::id(),
-              'is_verified' => false,
-          ]);
-          $structureId = null;
-      }
+        return response()->json([
+            'message' => 'Expérience enregistrée avec projet temporaire et structure ' . ($structureId ? 'officielle' : 'temporaire') . '.',
+            'experience' => $experience,
+            'temporary_structure' => $tempStructure,
+            'temporary_project' => $tempProject,
+        ], 201);
+    }
 
-      // Create temp project linked to temp or official structure
-      $tempProject = TemporaryProject::create([
-          'title' => $projectData['title'],
-          'description' => $projectData['description'] ?? null,
-          'country_id' => $projectData['country_id'],
-          'temp_structure_id' => $tempStructure->id ?? null,
-          'structure_id' => $structureId,
-          'start_date' => $projectData['start_date'],
-          'end_date' => $projectData['end_date'],
-          'website' => $projectData['website'] ?? null,
-          'project_image' => $request->file('project.project_image')?->store('project_images'),
-          'added_by' => Auth::id(),
-          'is_verified' => false,
-      ]);
-
-      $experience = Experience::create([
-          'user_id' => Auth::id(),
-          'structure_id' => $structureId,
-          'temp_structure_id' => $tempStructure->id ?? null,
-          'temp_project_id' => $tempProject->id,
-          'title' => $validated['title'],
-          'role' => $validated['role'],
-          'start_date' => $validated['start_date'],
-          'end_date' => $validated['end_date'] ?? null,
-      ]);
-
-      return response()->json([
-          'message' => 'Expérience enregistrée avec projet temporaire et structure ' . ($structureId ? 'officielle' : 'temporaire') . '.',
-          'experience' => $experience,
-          'temporary_structure' => $tempStructure,
-          'temporary_project' => $tempProject,
-      ], 201);
-  }
 
 
     public function update(Request $request, $id)
@@ -220,4 +210,41 @@ $validated = $request->validate([
 
         return response()->json(['message' => 'Expérience supprimée.']);
     }
+
+    public function myExperiences()
+{
+    $user = Auth::user();
+
+    if ($user->role !== 'professional') {
+        return response()->json(['error' => 'Non autorisé.'], 403);
+    }
+
+    $experiences = Experience::where('user_id', $user->id)
+        ->with(['structure', 'tempStructure', 'project', 'tempProject'])
+        ->get();
+
+    // Apply resolution logic for merged data
+    $experiences->transform(function ($exp) {
+        if (!$exp->structure && $exp->temp_structure_id) {
+            $merge = \App\Models\StructureMerge::where('original_id', $exp->temp_structure_id)->first();
+            if ($merge) {
+                $exp->structure = \App\Models\User::find($merge->official_id);
+                unset($exp->tempStructure);
+            }
+        }
+
+        if (!$exp->project && $exp->temp_project_id) {
+            $merge = \App\Models\ProjectMerge::where('original_id', $exp->temp_project_id)->first();
+            if ($merge) {
+                $exp->project = \App\Models\Project::find($merge->official_id);
+                unset($exp->tempProject);
+            }
+        }
+
+        return $exp;
+    });
+
+    return response()->json($experiences);
+}
+
 }

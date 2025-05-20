@@ -21,6 +21,7 @@ class UserController extends Controller
         $user = User::with('country')->findOrFail($id);
         return response()->json($user);
     }
+
     public function updateMe(Request $request)
   {
       $user = Auth::user();
@@ -36,11 +37,29 @@ class UserController extends Controller
           'first_name' => 'nullable|string',
           'last_name' => 'nullable|string',
           'company_name' => 'nullable|string',
-          'sector' => 'nullable|string',
+          'sector' => [
+              'nullable',
+              Rule::in([
+                  'Société de production',
+                  'Salle de cinéma',
+                  'Centre culturel',
+                  'Bureau d\'accueil des tournages',
+                  'Direction de la cinématographie',
+                  'Fonds de soutien',
+                  'Diffuseur/chaîne de télévision/plateforme',
+                  'Association de professionnels',
+                  'Festival',
+                  'Institution publique',
+                  'École de cinéma'
+              ])
+          ],
           'website' => 'nullable|url',
           'bio' => 'nullable|string',
           'country_id' => 'nullable|exists:countries,id',
-          'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+          'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+          'social_medias' => 'nullable|array',
+          'social_medias.*.platform' => 'required_with:social_medias.*.url|string',
+          'social_medias.*.url' => 'required_with:social_medias.*.platform|url',
       ]);
 
       if ($request->hasFile('profile_picture')) {
@@ -52,7 +71,7 @@ class UserController extends Controller
           \Log::info('Stored file path:', ['path' => $path]);
       }
 
-      \Log::info('Validated Data:', $validated);
+    
 
       $success = $user->update($validated);
       \Log::info('Update success?', ['success' => $success]);
@@ -62,6 +81,7 @@ class UserController extends Controller
           'user' => $user->fresh()
       ]);
   }
+
 
 
 

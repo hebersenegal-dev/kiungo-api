@@ -7,6 +7,7 @@ use App\Models\TemporaryProject;
 use App\Models\Project;
 use App\Models\ProjectMerge;
 use App\Models\StructureMerge;
+use App\Models\Experience;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -15,16 +16,16 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class TemporaryProjectResource extends Resource
 {
     protected static ?string $model = TemporaryProject::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static ?string $navigationLabel = 'Projets temporaires';
-
+    protected static ?string $pluralLabel = 'Projets temporaires';
+    protected static ?string $label = 'Projet temporaire';
     protected static ?string $navigationGroup = 'Projets';
 
     public static function table(Table $table): Table
@@ -54,50 +55,64 @@ class TemporaryProjectResource extends Resource
                     ->icon('heroicon-o-check')
                     ->visible(fn ($record) => !$record->is_verified && in_array(Auth::user()->role, ['admin', 'structure']))
                     ->action(function (TemporaryProject $record, array $data) {
-                        $merge = StructureMerge::where('original_id', $record->temp_structure_id)->first();
+                        return DB::transaction(function () use ($record, $data) {
+                            $merge = StructureMerge::where('original_id', $record->temp_structure_id)->first();
 
-                        if (! $merge) {
+                            if (!$merge) {
+                                Notification::make()
+                                    ->title('Structure non fusionnée')
+                                    ->body('La structure temporaire liée doit être fusionnée avant de pouvoir vérifier ce projet.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
+                            // Create official project
+                            $project = Project::create([
+                                'title' => $record->title,
+                                'description' => $record->description,
+                                'start_date' => $record->start_date,
+                                'end_date' => $record->end_date,
+                                'structure_id' => $merge->official_id,
+                                'created_by' => Auth::id(),
+                                'website' => $record->website,
+                                'project_image' => $record->project_image,
+                                'is_verified' => true,
+                                'is_temp_created' => true,
+                                'approved_by' => Auth::id(),
+                                'approved_at' => now(),
+                            ]);
+
+                            // Update all experiences linked to this temporary project
+                            DB::table('experiences')
+                                ->where('temp_project_id', $record->id)
+                                ->update([
+                                    'project_id' => $project->id,
+                                    'temp_project_id' => null
+                                ]);
+
+                            // Mark temporary project as verified
+                            $record->update([
+                                'is_verified' => true,
+                                'verified_at' => now(),
+                                'verified_by' => Auth::id(),
+                            ]);
+
+                            // Create merge record
+                            ProjectMerge::create([
+                                'original_id' => $record->id,
+                                'official_id' => $project->id,
+                                'merged_by' => Auth::id(),
+                                'merged_at' => now(),
+                                'notes' => $data['notes'] ?? null,
+                            ]);
+
                             Notification::make()
-                                ->title('Structure non fusionnée')
-                                ->body('La structure temporaire liée doit être fusionnée avant de pouvoir vérifier ce projet.')
-                                ->danger()
+                                ->title('Projet fusionné avec succès')
+                                ->body('Le projet et toutes ses expériences associées ont été migrés.')
+                                ->success()
                                 ->send();
-                            return;
-                        }
-
-                        $project = Project::create([
-                            'title' => $record->title,
-                            'description' => $record->description,
-                            'start_date' => $record->start_date,
-                            'end_date' => $record->end_date,
-                            'structure_id' => $merge->official_id,
-                            'created_by' => Auth::id(),
-                            'website' => $record->website,
-                            'project_image' => $record->project_image,
-                            'is_verified' => true,
-                            'is_temp_created' => true,
-                            'approved_by' => Auth::id(),
-                            'approved_at' => now(),
-                        ]);
-
-                        $record->update([
-                            'is_verified' => true,
-                            'verified_at' => now(),
-                            'verified_by' => Auth::id(),
-                        ]);
-
-                        ProjectMerge::create([
-                            'original_id' => $record->id,
-                            'official_id' => $project->id,
-                            'merged_by' => Auth::id(),
-                            'merged_at' => now(),
-                            'notes' => $data['notes'] ?? null,
-                        ]);
-
-                        Notification::make()
-                            ->title('Fusion réussie')
-                            ->success()
-                            ->send();
+                        });
                     })
                     ->form([
                         Forms\Components\Textarea::make('notes')

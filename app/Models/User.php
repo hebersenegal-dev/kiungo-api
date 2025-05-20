@@ -27,6 +27,7 @@ class User extends Authenticatable
         'verified_by',
         'temporary_structure_id',
         'profile_picture',
+        'social_medias',
     ];
 
     protected $hidden = ['password'];
@@ -34,10 +35,12 @@ class User extends Authenticatable
     protected $casts = [
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
+        'social_medias' => 'array',
+        'sector' => 'string', 
     ];
 
-
     protected $appends = ['profile_picture_url'];
+
 
     public function country()
     {
@@ -74,13 +77,10 @@ class User extends Authenticatable
         return $this->hasMany(Experience::class);
     }
 
-
     public function getProfilePictureUrlAttribute()
     {
         return $this->profile_picture
             ? asset('storage/' . $this->profile_picture)
             : null;
     }
-
-
 }

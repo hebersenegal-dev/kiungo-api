@@ -13,15 +13,17 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 
 class TemporaryStructureResource extends Resource
 {
     protected static ?string $model = TemporaryStructure::class;
 
-    // Libellés de navigation
     protected static ?string $navigationLabel = 'Structures Temporaires';
     protected static ?string $navigationGroup = 'Structures';
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $pluralLabel = 'Structures Temporaires';
+    protected static ?string $label = 'Structure Temporaire';
 
     public static function table(Table $table): Table
     {
@@ -93,49 +95,64 @@ class TemporaryStructureResource extends Resource
                             ->rows(3),
                     ])
                     ->action(function (TemporaryStructure $record, array $data) {
-                        $user = Auth::user();
+                        return DB::transaction(function () use ($record, $data) {
+                            $user = Auth::user();
 
-                        // Création de la structure officielle
-                        $official = User::create([
-                            'company_name' => $data['company_name'],
-                            'email' => $data['email'],
-                            'password' => bcrypt($data['password']),
-                            'role' => 'structure',
-                            'sector' => $data['sector'] ?? null,
-                            'country_id' => $data['country_id'],
-                            'website' => $data['website'] ?? null,
-                            'bio' => $data['bio'] ?? null,
-                            'profile_picture' => $data['profile_picture'] ?? null,
-                            'temporary_structure_id' => $record->id,
-                            'is_verified' => true,
-                            'verified_at' => now(),
-                            'verified_by' => $user->id,
-                        ]);
+                            // Create official structure
+                            $official = User::create([
+                                'company_name' => $data['company_name'],
+                                'email' => $data['email'],
+                                'password' => bcrypt($data['password']),
+                                'role' => 'structure',
+                                'sector' => $data['sector'] ?? null,
+                                'country_id' => $data['country_id'],
+                                'website' => $data['website'] ?? null,
+                                'bio' => $data['bio'] ?? null,
+                                'profile_picture' => $data['profile_picture'] ?? null,
+                                'temporary_structure_id' => $record->id,
+                                'is_verified' => true,
+                                'verified_at' => now(),
+                                'verified_by' => $user->id,
+                            ]);
 
-                        // Mise à jour de la structure temporaire
-                        $record->update([
-                            'is_verified' => true,
-                            'verified_at' => now(),
-                            'verified_by' => $user->id,
-                        ]);
+                            // Update all experiences linked to this temporary structure
+                            DB::table('experiences')
+                                ->where('temp_structure_id', $record->id)
+                                ->update([
+                                    'structure_id' => $official->id,
+                                    'temp_structure_id' => null
+                                ]);
 
-                        // Journalisation de la fusion
-                        StructureMerge::create([
-                            'original_id' => $record->id,
-                            'official_id' => $official->id,
-                            'merged_by' => $user->id,
-                            'merged_at' => now(),
-                            'notes' => $data['notes'] ?? null,
-                        ]);
+                            // Mark temporary structure as verified
+                            $record->update([
+                                'is_verified' => true,
+                                'verified_at' => now(),
+                                'verified_by' => $user->id,
+                            ]);
 
-                        Notification::make()
-                            ->title('Structure créée et fusionnée avec succès')
-                            ->success()
-                            ->send();
+                            // Log the merge
+                            StructureMerge::create([
+                                'original_id' => $record->id,
+                                'official_id' => $official->id,
+                                'merged_by' => $user->id,
+                                'merged_at' => now(),
+                                'notes' => $data['notes'] ?? null,
+                            ]);
+
+                            Notification::make()
+                                ->title('Structure fusionnée avec succès')
+                                ->body('La structure et toutes ses expériences associées ont été migrées.')
+                                ->success()
+                                ->send();
+                        });
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Confirmer la fusion')
                     ->modalDescription('Êtes-vous sûr de vouloir créer une structure officielle et fusionner les données ?'),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Supprimer les sélectionnés'),
             ]);
     }
 

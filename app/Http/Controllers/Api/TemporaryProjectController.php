@@ -92,7 +92,7 @@ public function verify(Request $request, $id)
       'is_temp_created' => true,
       'approved_by' => $user->id,
       'approved_at' => now(),
-      'project_image' => $tempProject->project_image, 
+      'project_image' => $tempProject->project_image,
   ]);
 
   // Mettre à jour le projet temporaire
@@ -116,6 +116,23 @@ public function verify(Request $request, $id)
       'official_project' => $official
   ]);
 }
+
+public function structureProjects()
+{
+    $user = Auth::user();
+
+    if ($user->role !== 'structure') {
+        return response()->json(['error' => 'Non autorisé.'], 403);
+    }
+
+    // Fetch all temporary projects where temp_structure_id matches the structure (user) ID
+    $projects = TemporaryProject::where('temp_structure_id', $user->id)
+        ->with('tempStructure')
+        ->get();
+
+    return response()->json($projects);
+}
+
 
 
 
