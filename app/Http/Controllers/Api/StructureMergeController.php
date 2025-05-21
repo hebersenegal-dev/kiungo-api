@@ -58,6 +58,12 @@ class StructureMergeController extends Controller
             'notes' => $request->input('notes'),
         ]);
 
+        // Update related experiences
+    \DB::table('experiences')
+    ->where('temp_structure_id', $temp->id)
+    ->update(['structure_id' => $structure->id]);
+
+
         return response()->json([
             'message' => 'Structure temporaire validée et fusionnée.',
             'structure' => $structure

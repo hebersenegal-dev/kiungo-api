@@ -16,6 +16,8 @@ class CountryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
     protected static ?string $navigationLabel = 'Pays';
+    protected static ?string $pluralLabel = 'Pays';
+    protected static ?string $label = 'Pays';
     protected static ?int $navigationSort = 10;
 
     public static function form(Forms\Form $form): Forms\Form

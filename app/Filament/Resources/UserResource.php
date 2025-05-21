@@ -26,7 +26,9 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?string $navigationLabel = 'Utilisateurs';
+    protected static ?string $navigationLabel = 'Professionnels';
+    protected static ?string $pluralLabel = 'Professionnels';
+    protected static ?string $label = 'Professionnel';
 
     public static function form(Form $form): Form
     {
@@ -51,9 +53,40 @@ class UserResource extends Resource
                         'professional' => 'Professionnel',
                     ])
                     ->required(),
+
+
                 Toggle::make('is_verified')
                     ->label('Vérifié'),
+
+
             ]),
+            Section::make('Réseaux sociaux')
+    ->schema([
+        Repeater::make('social_medias')
+            ->label('Réseaux sociaux')
+            ->schema([
+                Select::make('platform')
+                    ->label('Plateforme')
+                    ->options([
+                        'Facebook' => 'Facebook',
+                        'Instagram' => 'Instagram',
+                        'X' => 'X (Twitter)',
+                        'LinkedIn' => 'LinkedIn',
+                        'Other' => 'Autre',
+                    ])
+                    ->required(),
+
+                TextInput::make('url')
+                    ->label('Lien')
+                    ->url()
+                    ->required(),
+            ])
+            ->addActionLabel('Ajouter un réseau')
+            ->columns(2),
+    ]),
+
+
+
         ]);
     }
 
@@ -83,6 +116,9 @@ class UserResource extends Resource
                     ->formatStateUsing(fn ($state) => new HtmlString(
                         "<span class='font-medium'>{$state}</span> expérience" . ($state > 1 ? 's' : '')
                     )),
+
+                    
+
             ])
             ->filters([
                 TernaryFilter::make('is_verified')
@@ -100,24 +136,37 @@ class UserResource extends Resource
     ->modalSubmitAction(false)
     ->modalCancelActionLabel('Fermer')
     ->form(fn (User $record) => [
-        Repeater::make('experiences')
-            ->label(false)
-            ->schema([
-                TextInput::make('title')->label('Titre')->disabled(),
-                TextInput::make('role')->label('Rôle')->disabled(),
-                DatePicker::make('start_date')->label('Date de début')->disabled(),
-                DatePicker::make('end_date')->label('Date de fin')->disabled(),
-            ])
-            ->default(fn () => $record->experiences->map(function ($experience) {
-                return [
-                    'title' => $experience->title,
-                    'role' => $experience->role,
-                    'start_date' => $experience->start_date,
-                    'end_date' => $experience->end_date,
-                ];
-            })->toArray())
-            ->columns(2)
-            ->disabled(),
+      Repeater::make('experiences')
+  ->label(false)
+  ->schema([
+      Forms\Components\Placeholder::make('header')
+          ->content(fn ($get) =>
+              $get('title') .
+              ($get('is_verified') ? ' ✅' : ' ⏳')
+          )
+          ->columnSpanFull()
+          ->disableLabel(),
+
+      TextInput::make('role')->label('Rôle')->disabled(),
+      TextInput::make('structure')->label('Structure')->disabled(),
+      TextInput::make('project')->label('Projet')->disabled(),
+      DatePicker::make('start_date')->label('Début')->disabled(),
+      DatePicker::make('end_date')->label('Fin')->disabled(),
+  ])
+  ->default(fn () => $record->experiences->map(function ($experience) {
+      return [
+          'title' => $experience->title,
+          'role' => $experience->role,
+          'structure' => $experience->structure->company_name ?? $experience->tempStructure->company_name ?? '—',
+          'project' => $experience->project->title ?? $experience->tempProject->title ?? '—',
+          'start_date' => $experience->start_date,
+          'end_date' => $experience->end_date,
+          'is_verified' => $experience->structure_id !== null && $experience->project_id !== null,
+      ];
+  })->toArray())
+  ->columns(2)
+  ->disabled(),
+
     ]),
             ])
             ->bulkActions([

@@ -70,6 +70,12 @@ class ProjectMergeController extends Controller
             'notes' => $request->input('notes'),
         ]);
 
+        
+        \DB::table('experiences')
+        ->where('temp_project_id', $temp->id)
+        ->update(['project_id' => $project->id]);
+
+
         return response()->json([
             'message' => 'Projet temporaire validé et fusionné.',
             'project' => $project
