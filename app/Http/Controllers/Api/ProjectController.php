@@ -120,6 +120,8 @@ class ProjectController extends Controller
 
     // Associate project with authenticated structure
     $validated['structure_id'] = $user->id;
+    $validated['created_by'] = $user->id;
+    $validated['is_temp_created'] = false;
     $validated['is_verified'] = false;
 
     $project = Project::create($validated);
