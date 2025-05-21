@@ -34,30 +34,31 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ProjectController::class, 'index']);
+    Route::get('/mine', [ProjectController::class, 'myProjects']);
     Route::get('/{id}', [ProjectController::class, 'show']);
     Route::post('/', [ProjectController::class, 'store']);
     Route::put('/{id}', [ProjectController::class, 'update']);
     Route::delete('/{id}', [ProjectController::class, 'destroy']);
     Route::post('/{id}/verify', [ProjectController::class, 'verify']);
-    Route::get('/mine', [ProjectController::class, 'myProjects']);
 });
 
 Route::prefix('temporary-projects')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [TemporaryProjectController::class, 'index']);
+    Route::get('/structure/linked', [TemporaryProjectController::class, 'structureProjects']);
     Route::get('/{id}', [TemporaryProjectController::class, 'show']);
     Route::post('/', [TemporaryProjectController::class, 'store']);
     Route::post('/{id}/verify', [TemporaryProjectController::class, 'verify']);
-    Route::get('/structure/linked', [TemporaryProjectController::class, 'structureProjects']);
+
 });
 
 Route::prefix('experiences')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ExperienceController::class, 'index']);
+    Route::get('/my', [ExperienceController::class, 'myExperiences']);
+    Route::post('/with-temporaries', [ExperienceController::class, 'storeWithTemporaries']);
     Route::get('/{id}', [ExperienceController::class, 'show']);
     Route::post('/', [ExperienceController::class, 'store']);
     Route::put('/{id}', [ExperienceController::class, 'update']);
     Route::delete('/{id}', [ExperienceController::class, 'destroy']);
-    Route::post('/with-temporaries', [ExperienceController::class, 'storeWithTemporaries']);
-    Route::get('/my', [ExperienceController::class, 'myExperiences']);
 
 });
 
@@ -77,12 +78,13 @@ Route::prefix('temporary-structures')->middleware('auth:sanctum')->group(functio
     Route::get('/{id}', [TemporaryStructureController::class, 'show']);
 });
 
+Route::get('/countries', [CountryController::class, 'index']);
+Route::post('/countries', [CountryController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('/countries/{id}', [CountryController::class, 'update']);
     Route::delete('/countries/{id}', [CountryController::class, 'destroy']);
 });
-Route::get('/countries', [CountryController::class, 'index']);
-Route::post('/countries', [CountryController::class, 'store']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/structures', [StructureController::class, 'index']);
