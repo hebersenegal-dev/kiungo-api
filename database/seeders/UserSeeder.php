@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Kiungo',
             'email' => 'admin@kiungo.test',
             'password' => Hash::make('password'),
-            'role' => 'admin,
+            'role' => 'admin',
             'country_id' => 1,
             'is_verified' => true,
         ]);
