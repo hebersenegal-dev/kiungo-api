@@ -77,7 +77,7 @@ public function show($id)
             'project_id' => 'nullable|exists:projects,id',
             'temp_project_id' => 'nullable|exists:temporary_projects,id',
             'title' => 'required|string',
-            'role' => 'required|string',
+            'role' => ['required', 'string', Rule::in(Experience::ROLES)],
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'project.website' => 'nullable|url',
@@ -107,7 +107,7 @@ public function show($id)
     {
         $validated = $request->validate([
             'title' => 'required|string',
-            'role' => 'required|string',
+            'role' => ['required', 'string', Rule::in(Experience::ROLES)],
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
 

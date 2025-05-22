@@ -47,9 +47,9 @@ class UserResource extends Resource
                     ->label('Email'),
                 Select::make('role')
                     ->label('Rôle')
+                    ->default('professional')
                     ->options([
-                        'admin' => 'Administrateur',
-                        'structure' => 'Structure',
+
                         'professional' => 'Professionnel',
                     ])
                     ->required(),
@@ -117,7 +117,7 @@ class UserResource extends Resource
                         "<span class='font-medium'>{$state}</span> expérience" . ($state > 1 ? 's' : '')
                     )),
 
-                    
+
 
             ])
             ->filters([

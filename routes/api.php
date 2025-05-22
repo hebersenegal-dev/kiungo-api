@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\StructureMergeController;
 use App\Http\Controllers\Api\StructureController;
 use App\Http\Controllers\Api\ProjectMergeController;
 use App\Http\Controllers\Api\TemporaryStructureController;
+use App\Http\Controllers\Api\SearchController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -91,4 +92,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/structures/{id}', [StructureController::class, 'show']);
     Route::put('/structures/{id}', [StructureController::class, 'update']);
     Route::delete('/structures/{id}', [StructureController::class, 'destroy']); // optionnel
+});
+
+
+
+Route::prefix('search')->middleware('auth:sanctum')->group(function () {
+    Route::get('/professionals', [SearchController::class, 'search']);
+    Route::get('/suggestProfessional', [SearchController::class, 'autocompleteName']);
+
 });
