@@ -108,6 +108,7 @@ class SearchController extends Controller
       return [
            'name' => $user->first_name . ' ' . $user->last_name,
            'profile_picture' => $user->profile_picture ? asset('storage/' . $user->profile_picture) : null,
+           'user_id'=> $user->id,
        ];
 
     })->unique()->values();
