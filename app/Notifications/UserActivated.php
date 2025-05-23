@@ -11,12 +11,14 @@ class UserActivated extends Notification
 
     public function via($notifiable)
     {
-        return ['database', 'mail']; 
+        return ['database', 'mail'];
     }
 
     public function toArray($notifiable)
     {
         return [
+
+            'title' => 'Vérification du compte',
             'message' => 'Votre compte a été vérifié avec succès.',
         ];
     }
