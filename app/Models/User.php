@@ -6,9 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\UserActivated;
 
 class User extends Authenticatable
 {
+
+  protected static function booted()
+{
+    static::updating(function ($user) {
+        if ($user->isDirty('is_verified') && $user->is_verified) {
+            $user->notify(new UserActivated());
+        }
+    });
+}
+
     use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
@@ -36,7 +47,7 @@ class User extends Authenticatable
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
         'social_medias' => 'array',
-        'sector' => 'string', 
+        'sector' => 'string',
     ];
 
     protected $appends = ['profile_picture_url'];

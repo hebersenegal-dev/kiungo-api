@@ -104,8 +104,19 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
 
 });
 
-Route::middleware('auth:sanctum')->get('/notifications', function (Request $request) {
-    return response()->json([
-        'notifications' => $request->user()->notifications,
-    ]);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications/unread', function (Request $request) {
+        return $request->user()->unreadNotifications;
+    });
+
+    Route::post('/notifications/{id}/mark-as-read', function ($id, Request $request) {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['message' => 'Notification marked as read.']);
+    });
+
+    Route::post('/notifications/mark-all-read', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+        return response()->json(['message' => 'All notifications marked as read.']);
+    });
 });
