@@ -103,3 +103,9 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
     Route::get('/suggestProfessional', [SearchController::class, 'autocompleteName']);
 
 });
+
+Route::middleware('auth:sanctum')->get('/notifications', function (Request $request) {
+    return response()->json([
+        'notifications' => $request->user()->notifications,
+    ]);
+});

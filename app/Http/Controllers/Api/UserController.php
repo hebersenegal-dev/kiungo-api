@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Notifications\UserActivated;
+
 
 class UserController extends Controller
 {
@@ -71,7 +73,7 @@ class UserController extends Controller
           \Log::info('Stored file path:', ['path' => $path]);
       }
 
-    
+
 
       $success = $user->update($validated);
       \Log::info('Update success?', ['success' => $success]);
@@ -98,6 +100,8 @@ class UserController extends Controller
             'verified_at' => now(),
             'verified_by' => $admin->id
         ]);
+
+        $user->notify(new UserActivated());
 
         // Gestion de la fusion automatique si la structure avait une temporary_structure_id
         if ($user->role === 'structure' && $user->temporary_structure_id) {

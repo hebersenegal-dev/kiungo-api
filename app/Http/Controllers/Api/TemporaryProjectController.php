@@ -12,12 +12,23 @@ use Illuminate\Support\Facades\Auth;
 
 class TemporaryProjectController extends Controller
 {
-    public function index()
-    {
-        return response()->json(
-            TemporaryProject::where('added_by', Auth::id())->with('tempStructure')->get()
-        );
-    }
+  public function index()
+{
+  $user = Auth::user();
+
+
+  if ($user->role !== 'structure') {
+      return response()->json(['error' => 'Non autorisé.'], 403);
+  }
+
+  $projects = TemporaryProject::where('temp_structure_id', $user->id)
+      ->where('is_verified', false)
+      ->with('tempStructure')
+      ->get();
+
+  return response()->json($projects);
+}
+
 
     public function show($id)
     {
