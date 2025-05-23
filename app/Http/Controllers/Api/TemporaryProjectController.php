@@ -134,6 +134,47 @@ public function structureProjects()
 }
 
 
+public function update(Request $request, $id)
+{
+    $project = TemporaryProject::findOrFail($id);
+
+    // Vérifie que l'utilisateur connecté est celui qui a ajouté le projet
+    if ($project->added_by !== Auth::id()) {
+        return response()->json(['message' => 'Non autorisé à modifier ce projet.'], 403);
+    }
+
+    $validated = $request->validate([
+        'title' => 'sometimes|required|string',
+        'description' => 'sometimes|required|string',
+        'start_date' => 'sometimes|required|date',
+        'end_date' => 'sometimes|required|date|after_or_equal:start_date',
+        'temp_structure_id' => 'nullable|exists:temporary_structures,id',
+        'structure_id' => 'nullable|exists:structures,id',
+        'website' => 'nullable|url',
+        'project_image' => 'nullable|image|max:2048',
+    ]);
+
+    // At least one structure ID must be provided if modifying them
+    if ($request->has('temp_structure_id') || $request->has('structure_id')) {
+        if (!$request->filled('temp_structure_id') && !$request->filled('structure_id')) {
+            return response()->json(['error' => 'Vous devez fournir temp_structure_id ou structure_id.'], 422);
+        }
+    }
+
+    // Handle new image upload if provided
+    if ($request->hasFile('project_image')) {
+        $validated['project_image'] = $request->file('project_image')->store('project_images', 'public');
+    }
+
+    $project->update($validated);
+
+    return response()->json([
+        'message' => 'Projet temporaire mis à jour.',
+        'project' => $project->load('tempStructure')
+    ]);
+}
+
+
 
 
 }

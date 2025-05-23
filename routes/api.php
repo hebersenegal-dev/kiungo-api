@@ -49,7 +49,7 @@ Route::prefix('temporary-projects')->middleware('auth:sanctum')->group(function 
     Route::get('/{id}', [TemporaryProjectController::class, 'show']);
     Route::post('/', [TemporaryProjectController::class, 'store']);
     Route::post('/{id}/verify', [TemporaryProjectController::class, 'verify']);
-
+    Route::put('/{id}', [TemporaryProjectController::class, 'update']);
 });
 
 Route::prefix('experiences')->middleware('auth:sanctum')->group(function () {
@@ -77,6 +77,7 @@ Route::prefix('temporary-structures')->middleware('auth:sanctum')->group(functio
     Route::get('/', [TemporaryStructureController::class, 'index']);
     Route::post('/', [TemporaryStructureController::class, 'store']);
     Route::get('/{id}', [TemporaryStructureController::class, 'show']);
+    Route::put('/{id}', [TemporaryStructureController::class, 'update']);
 });
 
 Route::get('/countries', [CountryController::class, 'index']);

@@ -46,4 +46,30 @@ class TemporaryStructureController extends Controller
         $structure = TemporaryStructure::with('country')->findOrFail($id);
         return response()->json($structure);
     }
+
+    // Mise à jour d’une structure temporaire
+public function update(Request $request, $id)
+{
+    $structure = TemporaryStructure::findOrFail($id);
+
+    // Vérifie que l'utilisateur connecté est bien celui qui a ajouté la structure
+    if ($structure->added_by !== Auth::id()) {
+        return response()->json(['message' => 'Non autorisé à modifier cette structure.'], 403);
+    }
+
+    $request->validate([
+        'company_name' => 'sometimes|required|string|max:255',
+        'sector' => 'sometimes|required|string|max:255',
+        'country_id' => 'sometimes|required|exists:countries,id',
+        'website' => 'nullable|url',
+    ]);
+
+    $structure->update($request->only(['company_name', 'sector', 'country_id', 'website']));
+
+    return response()->json([
+        'message' => 'Structure temporaire mise à jour.',
+        'structure' => $structure
+    ]);
+}
+
 }
