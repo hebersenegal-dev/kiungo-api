@@ -14,7 +14,19 @@ return new class extends Migration
       Schema::create('temporary_structures', function (Blueprint $table) {
     $table->id();
     $table->string('company_name');
-    $table->string('sector');
+    $table->enum('sector', [
+      'societe_de_production',
+    'salle_de_cinema',
+    'centre_culturel',
+    'bureau_accueil_tournages',
+    'direction_cinematographie',
+    'fonds_de_soutien',
+    'diffuseur_chaine_tv_plateforme',
+    'association_professionnels',
+    'festival',
+    'institution_publique',
+    'ecole_de_cinema'
+    ])->nullable();
     $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
     $table->string('website')->nullable();
     $table->unsignedBigInteger('added_by'); // FK deferred

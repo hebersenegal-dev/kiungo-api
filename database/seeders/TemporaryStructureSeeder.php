@@ -9,7 +9,7 @@ class TemporaryStructureSeeder extends Seeder
     {
         TemporaryStructure::create([
             'company_name' => 'InnovaFilm',
-            'sector' => 'BTP',
+            'sector' => 'centre_culturel',
             'country_id' => 1,
             'website' => 'https://innovafilm.example',
             'added_by' => 2,

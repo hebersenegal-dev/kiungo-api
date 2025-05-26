@@ -56,17 +56,17 @@ class StructureResource extends Resource
                 Select::make('sector')
                     ->label('Secteur')
                     ->options([
-                        'Société de production' => 'Société de production',
-                        'Salle de cinéma' => 'Salle de cinéma',
-                        'Centre culturel' => 'Centre culturel',
-                        'Bureau d\'accueil des tournages' => 'Bureau d\'accueil des tournages',
-                        'Direction de la cinématographie' => 'Direction de la cinématographie',
-                        'Fonds de soutien' => 'Fonds de soutien',
-                        'Diffuseur/chaîne de télévision/plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
-                        'Association de professionnels' => 'Association de professionnels',
-                        'Festival' => 'Festival',
-                        'Institution publique' => 'Institution publique',
-                        'École de cinéma' => 'École de cinéma',
+                      'societe_de_production' => 'Société de production',
+     'salle_de_cinema' => 'Salle de cinéma',
+     'centre_culturel' => 'Centre culturel',
+     'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+     'direction_cinematographie' => 'Direction de la cinématographie',
+     'fonds_de_soutien' => 'Fonds de soutien',
+     'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+     'association_professionnels' => 'Association de professionnels',
+     'festival' => 'Festival',
+     'institution_publique' => 'Institution publique',
+     'ecole_de_cinema' => 'École de cinéma'
                     ])
                     ->required(),
 
@@ -99,10 +99,26 @@ class StructureResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('sector')
-                    ->label('Secteur')
-                    ->sortable()
-                    ->searchable(),
+                    Tables\Columns\TextColumn::make('sector')
+          ->label('Secteur')
+          ->sortable()
+          ->searchable()
+          ->formatStateUsing(function (string $state): string {
+              return [
+                  'societe_de_production' => 'Société de production',
+                  'salle_de_cinema' => 'Salle de cinéma',
+                  'centre_culturel' => 'Centre culturel',
+                  'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+                  'direction_cinematographie' => 'Direction de la cinématographie',
+                  'fonds_de_soutien' => 'Fonds de soutien',
+                  'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+                  'association_professionnels' => 'Association de professionnels',
+                  'festival' => 'Festival',
+                  'institution_publique' => 'Institution publique',
+                  'ecole_de_cinema' => 'École de cinéma',
+              ][$state] ?? $state;
+          }),
+
 
                 Tables\Columns\TextColumn::make('country.name')
                     ->label('Pays'),
@@ -118,17 +134,17 @@ class StructureResource extends Resource
                 SelectFilter::make('sector')
                     ->label('Secteur')
                     ->options([
-                        'Société de production' => 'Société de production',
-                        'Salle de cinéma' => 'Salle de cinéma',
-                        'Centre culturel' => 'Centre culturel',
-                        'Bureau d\'accueil des tournages' => 'Bureau d\'accueil des tournages',
-                        'Direction de la cinématographie' => 'Direction de la cinématographie',
-                        'Fonds de soutien' => 'Fonds de soutien',
-                        'Diffuseur/chaîne de télévision/plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
-                        'Association de professionnels' => 'Association de professionnels',
-                        'Festival' => 'Festival',
-                        'Institution publique' => 'Institution publique',
-                        'École de cinéma' => 'École de cinéma',
+                      'societe_de_production' => 'Société de production',
+   'salle_de_cinema' => 'Salle de cinéma',
+   'centre_culturel' => 'Centre culturel',
+   'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+   'direction_cinematographie' => 'Direction de la cinématographie',
+   'fonds_de_soutien' => 'Fonds de soutien',
+   'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+   'association_professionnels' => 'Association de professionnels',
+   'festival' => 'Festival',
+   'institution_publique' => 'Institution publique',
+   'ecole_de_cinema' => 'École de cinéma'
                     ])
                     ->searchable(),
             ])

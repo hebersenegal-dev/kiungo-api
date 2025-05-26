@@ -12,7 +12,7 @@ class ExperienceSeeder extends Seeder
             'structure_id' => 3,
             'project_id' => 1,
             'title' => 'Chef de chantier',
-            'role' => 'Superviseure des travaux',
+            'role' => 'concept_artist',
             'start_date' => '2024-01-15',
             'end_date' => '2024-06-15',
         ]);
@@ -22,7 +22,7 @@ class ExperienceSeeder extends Seeder
             'temp_structure_id' => 1,
             'temp_project_id' => 1,
             'title' => 'Conducteur de travaux',
-            'role' => 'Coordination technique',
+            'role' => 'concept_artist',
             'start_date' => '2023-05-15',
             'end_date' => '2023-12-15',
         ]);
