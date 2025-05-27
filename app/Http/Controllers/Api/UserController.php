@@ -75,17 +75,17 @@ class UserController extends Controller
           'sector' => [
               'nullable',
               Rule::in([
-                  'Société de production',
-                  'Salle de cinéma',
-                  'Centre culturel',
-                  'Bureau d\'accueil des tournages',
-                  'Direction de la cinématographie',
-                  'Fonds de soutien',
-                  'Diffuseur/chaîne de télévision/plateforme',
-                  'Association de professionnels',
-                  'Festival',
-                  'Institution publique',
-                  'École de cinéma'
+                'societe_de_production',
+              'salle_de_cinema',
+              'centre_culturel',
+              'bureau_accueil_tournages',
+              'direction_cinematographie',
+              'fonds_de_soutien',
+              'diffuseur_chaine_tv_plateforme',
+              'association_professionnels',
+              'festival',
+              'institution_publique',
+              'ecole_de_cinema'
               ])
           ],
           'website' => 'nullable|url',
