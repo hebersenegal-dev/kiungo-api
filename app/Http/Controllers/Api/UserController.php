@@ -22,15 +22,15 @@ class UserController extends Controller
     {
         $user = User::with([
             'country',
-            'experiences' => function($query) {
+            'experiences' => function ($query) {
                 $query->with([
                     'structure:id,company_name,sector,country_id,website,profile_picture',
                     'tempStructure:id,company_name,sector,country_id,website',
                     'project:id,title,description,start_date,end_date,website,project_image,is_verified',
                     'tempProject:id,title,description,start_date,end_date,website,project_image'
                 ])
-                ->orderByDesc('start_date')
-                ->orderByDesc('end_date');
+                    ->orderByDesc('start_date')
+                    ->orderByDesc('end_date');
             }
         ])->findOrFail($id);
 
@@ -38,7 +38,7 @@ class UserController extends Controller
         $userData = $user->toArray();
 
         if (isset($userData['experiences'])) {
-            $userData['experiences'] = array_map(function($experience) {
+            $userData['experiences'] = array_map(function ($experience) {
                 return [
                     'id' => $experience['id'],
                     'title' => $experience['title'],
@@ -58,64 +58,64 @@ class UserController extends Controller
 
 
     public function updateMe(Request $request)
-  {
-      $user = Auth::user();
+    {
+        $user = Auth::user();
 
-      if (!$user) {
-          return response()->json(['error' => 'Unauthenticated'], 401);
-      }
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
 
-      \Log::info('User Authenticated:', ['id' => $user->id]);
-      \Log::info('Request Data:', $request->all());
+        \Log::info('User Authenticated:', ['id' => $user->id]);
+        \Log::info('Request Data:', $request->all());
 
-      $validated = $request->validate([
-          'first_name' => 'nullable|string',
-          'last_name' => 'nullable|string',
-          'company_name' => 'nullable|string',
-          'sector' => [
-              'nullable',
-              Rule::in([
-                  'Société de production',
-                  'Salle de cinéma',
-                  'Centre culturel',
-                  'Bureau d\'accueil des tournages',
-                  'Direction de la cinématographie',
-                  'Fonds de soutien',
-                  'Diffuseur/chaîne de télévision/plateforme',
-                  'Association de professionnels',
-                  'Festival',
-                  'Institution publique',
-                  'École de cinéma'
-              ])
-          ],
-          'website' => 'nullable|url',
-          'bio' => 'nullable|string',
-          'country_id' => 'nullable|exists:countries,id',
-          'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-          'social_medias' => 'nullable|array',
-          'social_medias.*.platform' => 'required_with:social_medias.*.url|string',
-          'social_medias.*.url' => 'required_with:social_medias.*.platform|url',
-      ]);
+        $validated = $request->validate([
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'company_name' => 'nullable|string',
+            'sector' => [
+                'nullable',
+                Rule::in([
+                    'societe_de_production',
+                    'salle_de_cinema',
+                    'centre_culturel',
+                    'bureau_accueil_tournages',
+                    'direction_cinematographie',
+                    'fonds_de_soutien',
+                    'diffuseur_chaine_tv_plateforme',
+                    'association_professionnels',
+                    'festival',
+                    'institution_publique',
+                    'ecole_de_cinema'
+                ])
+            ],
+            'website' => 'nullable|url',
+            'bio' => 'nullable|string',
+            'country_id' => 'nullable|exists:countries,id',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'social_medias' => 'nullable|array',
+            'social_medias.*.platform' => 'required_with:social_medias.*.url|string',
+            'social_medias.*.url' => 'required_with:social_medias.*.platform|url',
+        ]);
 
-      if ($request->hasFile('profile_picture')) {
-          $file = $request->file('profile_picture');
-          $filename = time() . '_' . $file->getClientOriginalName();
-          $path = $file->storeAs('profile_pictures', $filename, 'public');
-          $validated['profile_picture'] = $path;
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('profile_pictures', $filename, 'public');
+            $validated['profile_picture'] = $path;
 
-          \Log::info('Stored file path:', ['path' => $path]);
-      }
+            \Log::info('Stored file path:', ['path' => $path]);
+        }
 
 
 
-      $success = $user->update($validated);
-      \Log::info('Update success?', ['success' => $success]);
+        $success = $user->update($validated);
+        \Log::info('Update success?', ['success' => $success]);
 
-      return response()->json([
-          'message' => 'Profil mis à jour avec succès.',
-          'user' => $user->fresh()
-      ]);
-  }
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès.',
+            'user' => $user->fresh()
+        ]);
+    }
 
 
 
@@ -150,5 +150,4 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
-
 }

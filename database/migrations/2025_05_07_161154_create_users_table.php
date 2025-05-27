@@ -6,51 +6,50 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-     public function up(): void
-     {
-       Schema::create('users', function (Blueprint $table) {
-  $table->id();
-  $table->string('first_name')->nullable();
-  $table->string('last_name')->nullable();
-  $table->string('company_name')->nullable();
-  $table->string('email')->unique();
-  $table->string('password');
-  $table->enum('role', ['professional', 'structure', 'admin']);
-  $table->enum('sector', [
-    'societe_de_production',
-  'salle_de_cinema',
-  'centre_culturel',
-  'bureau_accueil_tournages',
-  'direction_cinematographie',
-  'fonds_de_soutien',
-  'diffuseur_chaine_tv_plateforme',
-  'association_professionnels',
-  'festival',
-  'institution_publique',
-  'ecole_de_cinema'
-  ])->nullable();
-  $table->json('social_medias')->nullable();
-  $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
-  $table->string('website')->nullable();
-  $table->text('bio')->nullable();
-  $table->string('profile_picture')->nullable();
-  $table->boolean('is_verified')->default(false);
-  $table->timestamp('verified_at')->nullable();
-  $table->unsignedBigInteger('verified_by')->nullable();
-  $table->unsignedBigInteger('temporary_structure_id')->nullable();
-  $table->timestamps();
-});
+  /**
+   * Run the migrations.
+   */
+  public function up(): void
+  {
+    Schema::create('users', function (Blueprint $table) {
+      $table->id();
+      $table->string('first_name')->nullable();
+      $table->string('last_name')->nullable();
+      $table->string('company_name')->nullable();
+      $table->string('email')->unique();
+      $table->string('password');
+      $table->enum('role', ['professional', 'structure', 'admin']);
+      $table->enum('sector', [
+        'societe_de_production',
+        'salle_de_cinema',
+        'centre_culturel',
+        'bureau_accueil_tournages',
+        'direction_cinematographie',
+        'fonds_de_soutien',
+        'diffuseur_chaine_tv_plateforme',
+        'association_professionnels',
+        'festival',
+        'institution_publique',
+        'ecole_de_cinema'
+      ])->nullable();
+      $table->json('social_medias')->nullable();
+      $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
+      $table->string('website')->nullable();
+      $table->text('bio')->nullable();
+      $table->string('profile_picture')->nullable();
+      $table->boolean('is_verified')->default(false);
+      $table->timestamp('verified_at')->nullable();
+      $table->unsignedBigInteger('verified_by')->nullable();
+      $table->unsignedBigInteger('temporary_structure_id')->nullable();
+      $table->timestamps();
+    });
+  }
 
-     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
+  /**
+   * Reverse the migrations.
+   */
+  public function down(): void
+  {
+    Schema::dropIfExists('users');
+  }
 };
