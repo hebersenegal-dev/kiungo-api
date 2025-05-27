@@ -68,34 +68,34 @@ class UserController extends Controller
         \Log::info('User Authenticated:', ['id' => $user->id]);
         \Log::info('Request Data:', $request->all());
 
-        $validated = $request->validate([
-            'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'company_name' => 'nullable|string',
-            'sector' => [
-                'nullable',
-                Rule::in([
-                    'societe_de_production',
-                    'salle_de_cinema',
-                    'centre_culturel',
-                    'bureau_accueil_tournages',
-                    'direction_cinematographie',
-                    'fonds_de_soutien',
-                    'diffuseur_chaine_tv_plateforme',
-                    'association_professionnels',
-                    'festival',
-                    'institution_publique',
-                    'ecole_de_cinema'
-                ])
-            ],
-            'website' => 'nullable|url',
-            'bio' => 'nullable|string',
-            'country_id' => 'nullable|exists:countries,id',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'social_medias' => 'nullable|array',
-            'social_medias.*.platform' => 'required_with:social_medias.*.url|string',
-            'social_medias.*.url' => 'required_with:social_medias.*.platform|url',
-        ]);
+      $validated = $request->validate([
+          'first_name' => 'nullable|string',
+          'last_name' => 'nullable|string',
+          'company_name' => 'nullable|string',
+          'sector' => [
+              'nullable',
+              Rule::in([
+                'societe_de_production',
+              'salle_de_cinema',
+              'centre_culturel',
+              'bureau_accueil_tournages',
+              'direction_cinematographie',
+              'fonds_de_soutien',
+              'diffuseur_chaine_tv_plateforme',
+              'association_professionnels',
+              'festival',
+              'institution_publique',
+              'ecole_de_cinema'
+              ])
+          ],
+          'website' => 'nullable|url',
+          'bio' => 'nullable|string',
+          'country_id' => 'nullable|exists:countries,id',
+          'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+          'social_medias' => 'nullable|array',
+          'social_medias.*.platform' => 'required_with:social_medias.*.url|string',
+          'social_medias.*.url' => 'required_with:social_medias.*.platform|url',
+      ]);
 
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
