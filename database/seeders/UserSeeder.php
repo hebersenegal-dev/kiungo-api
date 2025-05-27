@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Admin
+        //Admin
         $admin = User::create([
             'first_name' => 'Admin',
             'last_name' => 'Kiungo',
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             'email' => 'contact@btp-solutions.sn',
             'password' => Hash::make('password'),
             'role' => 'structure',
-            'sector' => 'Construction',
+            'sector' => 'centre_culturel',
             'country_id' => 1,
             'website' => 'https://btp-solutions.sn',
             'is_verified' => true,

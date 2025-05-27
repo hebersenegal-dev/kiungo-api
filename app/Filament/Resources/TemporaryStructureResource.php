@@ -33,8 +33,24 @@ class TemporaryStructureResource extends Resource
                     ->searchable()
                     ->label('Nom de l\'entreprise'),
 
-                Tables\Columns\TextColumn::make('sector')
-                    ->label('Secteur'),
+                    Tables\Columns\TextColumn::make('sector')
+                        ->label('Secteur')
+                        ->formatStateUsing(function (string $state): string {
+                            return [
+                                'societe_de_production' => 'Société de production',
+                                'salle_de_cinema' => 'Salle de cinéma',
+                                'centre_culturel' => 'Centre culturel',
+                                'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+                                'direction_cinematographie' => 'Direction de la cinématographie',
+                                'fonds_de_soutien' => 'Fonds de soutien',
+                                'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+                                'association_professionnels' => 'Association de professionnels',
+                                'festival' => 'Festival',
+                                'institution_publique' => 'Institution publique',
+                                'ecole_de_cinema' => 'École de cinéma',
+                            ][$state] ?? $state;
+                        }),
+
 
                 Tables\Columns\TextColumn::make('country.name')
                     ->label('Pays'),
@@ -68,9 +84,22 @@ class TemporaryStructureResource extends Resource
                             ->minLength(6)
                             ->label('Mot de passe'),
 
-                        Forms\Components\TextInput::make('sector')
-                            ->default($record->sector)
-                            ->label('Secteur'),
+                            Forms\Components\Select::make('sector')
+                ->options([
+                    'societe_de_production' => 'Société de production',
+                    'salle_de_cinema' => 'Salle de cinéma',
+                    'centre_culturel' => 'Centre culturel',
+                    'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+                    'direction_cinematographie' => 'Direction de la cinématographie',
+                    'fonds_de_soutien' => 'Fonds de soutien',
+                    'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+                    'association_professionnels' => 'Association de professionnels',
+                    'festival' => 'Festival',
+                    'institution_publique' => 'Institution publique',
+                    'ecole_de_cinema' => 'École de cinéma',
+                ])
+                ->required()
+                ->label('Secteur'),
 
                         Forms\Components\Select::make('country_id')
                             ->relationship('country', 'name')
@@ -157,26 +186,40 @@ class TemporaryStructureResource extends Resource
     }
 
     public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\TextInput::make('company_name')
-                ->required()
-                ->label('Nom de l\'entreprise'),
+  {
+      return $form->schema([
+          Forms\Components\TextInput::make('company_name')
+              ->required()
+              ->label('Nom de l\'entreprise'),
 
-            Forms\Components\TextInput::make('sector')
-                ->required()
-                ->label('Secteur'),
+          Forms\Components\Select::make('sector')
+              ->options([
+                  'societe_de_production' => 'Société de production',
+                  'salle_de_cinema' => 'Salle de cinéma',
+                  'centre_culturel' => 'Centre culturel',
+                  'bureau_accueil_tournages' => 'Bureau d\'accueil des tournages',
+                  'direction_cinematographie' => 'Direction de la cinématographie',
+                  'fonds_de_soutien' => 'Fonds de soutien',
+                  'diffuseur_chaine_tv_plateforme' => 'Diffuseur/chaîne de télévision/plateforme',
+                  'association_professionnels' => 'Association de professionnels',
+                  'festival' => 'Festival',
+                  'institution_publique' => 'Institution publique',
+                  'ecole_de_cinema' => 'École de cinéma',
+              ])
+              ->required()
+              ->label('Secteur'),
 
-            Forms\Components\Select::make('country_id')
-                ->relationship('country', 'name')
-                ->required()
-                ->label('Pays'),
+          Forms\Components\Select::make('country_id')
+              ->relationship('country', 'name')
+              ->required()
+              ->label('Pays'),
 
-            Forms\Components\TextInput::make('website')
-                ->url()
-                ->label('Site web'),
-        ]);
-    }
+          Forms\Components\TextInput::make('website')
+              ->url()
+              ->label('Site web'),
+      ]);
+  }
+
 
     public static function getRelations(): array
     {

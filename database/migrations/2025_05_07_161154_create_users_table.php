@@ -20,17 +20,17 @@ return new class extends Migration
   $table->string('password');
   $table->enum('role', ['professional', 'structure', 'admin']);
   $table->enum('sector', [
-      'Soci\u00e9t\u00e9 de production',
-      'Salle de cin\u00e9ma',
-      'Centre culturel',
-      'Bureau d\u0027accueil des tournages',
-      'Direction de la cin\u00e9matographie',
-      'Fonds de soutien',
-      'Diffuseur/cha\u00eene de t\u00e9l\u00e9vision/plateforme',
-      'Association de professionnels',
-      'Festival',
-      'Institution publique',
-      '\u00c9cole de cin\u00e9ma'
+    'societe_de_production',
+  'salle_de_cinema',
+  'centre_culturel',
+  'bureau_accueil_tournages',
+  'direction_cinematographie',
+  'fonds_de_soutien',
+  'diffuseur_chaine_tv_plateforme',
+  'association_professionnels',
+  'festival',
+  'institution_publique',
+  'ecole_de_cinema'
   ])->nullable();
   $table->json('social_medias')->nullable();
   $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');

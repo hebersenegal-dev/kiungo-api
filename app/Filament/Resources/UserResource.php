@@ -30,6 +30,53 @@ class UserResource extends Resource
     protected static ?string $pluralLabel = 'Professionnels';
     protected static ?string $label = 'Professionnel';
 
+    public static function getFormattedRole(string $role): string
+{
+    return match ($role) {
+        'realisateur' => 'Réalisateur',
+        'producteur' => 'Producteur',
+        'assistant_realisateur' => 'Assistant Réalisateur',
+        'scripte' => 'Scripte',
+        'charge_production' => 'Chargé de production',
+        'directeur_photographie' => 'Directeur de la photographie',
+        'chef_operateur' => 'Chef opérateur',
+        'cadreur' => 'Cadreur',
+        'cameraman' => 'Cameraman',
+        'assistant_operateur' => 'Assistant opérateur',
+        'premier_assistant_camera' => '1er assistant caméra',
+        'etalonneur' => 'Étalonneur',
+        'ingenieur_son' => 'Ingénieur du son',
+        'chef_operateur_son' => 'Chef opérateur son',
+        'perchiste' => 'Perchiste',
+        'monteur_son' => 'Monteur son',
+        'mixeur' => 'Mixeur',
+        'designer_sonore' => 'Designer sonore',
+        'monteur_image' => 'Monteur image',
+        'monteur_effets_speciaux' => 'Monteur effets spéciaux',
+        'motion_designer' => 'Motion designer',
+        'scenariste' => 'Scénariste',
+        'dialoguiste' => 'Dialoguiste',
+        'documentariste' => 'Documentariste',
+        'animateur_2d' => 'Animateur 2D',
+        'animateur_3d' => 'Animateur 3D',
+        'storyboarder' => 'Storyboarder',
+        'concept_artist' => 'Concept artist',
+        'journaliste_reporter_images' => 'Journaliste reporter d’images',
+        'regisseur_general' => 'Régisseur général',
+        'technicien_broadcasting' => 'Technicien broadcasting',
+        'videaste' => 'Vidéoaste',
+        'technicien_plateau' => 'Technicien plateau',
+        'operateur_lumiere' => 'Opérateur lumière',
+        'createur_contenu_video' => 'Créateur de contenu vidéo',
+        'specialiste_realite_virtuelle' => 'Spécialiste réalité virtuelle',
+        'specialiste_realite_augmentee' => 'Spécialiste réalité augmentée',
+        'responsable_chaine' => 'Responsable de chaîne',
+        'community_manager_video' => 'Community manager vidéo',
+        default => ucfirst(str_replace('_', ' ', $role)),
+    };
+}
+
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -156,7 +203,7 @@ class UserResource extends Resource
   ->default(fn () => $record->experiences->map(function ($experience) {
       return [
           'title' => $experience->title,
-          'role' => $experience->role,
+          'role' => self::getFormattedRole($experience->role),
           'structure' => $experience->structure->company_name ?? $experience->tempStructure->company_name ?? '—',
           'project' => $experience->project->title ?? $experience->tempProject->title ?? '—',
           'start_date' => $experience->start_date,
@@ -164,6 +211,7 @@ class UserResource extends Resource
           'is_verified' => $experience->structure_id !== null && $experience->project_id !== null,
       ];
   })->toArray())
+
   ->columns(2)
   ->disabled(),
 
