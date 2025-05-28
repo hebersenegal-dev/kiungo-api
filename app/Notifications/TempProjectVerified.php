@@ -11,40 +11,43 @@ class TempProjectVerified extends Notification
 {
     use Queueable;
 
-    public TemporaryProject $tempProject;
-    public int $officialProjectId;
+    protected TemporaryProject $tempProject;
 
     /**
      * Create a new notification instance.
-     *
-     * @param TemporaryProject $tempProject
-     * @param int $officialProjectId
      */
-    public function __construct(TemporaryProject $tempProject, int $officialProjectId)
+    public function __construct(TemporaryProject $tempProject)
     {
         $this->tempProject = $tempProject;
-        $this->officialProjectId = $officialProjectId;
     }
 
-    public function via($notifiable)
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via($notifiable): array
     {
         return ['mail', 'database'];
     }
 
-    public function toMail($notifiable)
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Projet vérifié')
-            ->line("Le projet \"{$this->tempProject->title}\" a été vérifié et publié avec succès.")
-            ->action('Voir le projet', url('/projects/' . $this->officialProjectId));
+            ->subject('Nouveau projet temporaire à valider')
+            ->line("Un nouveau projet temporaire intitulé \"{$this->tempProject->title}\" a été ajouté.")
     }
 
-    public function toArray($notifiable)
+    /**
+     * Get the array representation of the notification.
+     */
+    public function toArray($notifiable): array
     {
         return [
-            'title' => 'Projet vérifié',
-            'message' => "Le projet \"{$this->tempProject->title}\" a été vérifié et publié avec succès.",
-            'project_id' => $this->officialProjectId,
+            'title' => 'Nouveau projet temporaire à valider',
+            'message' => "Le projet \"{$this->tempProject->title}\" a été soumis pour validation.",
+            'temporary_project_id' => $this->tempProject->id,
         ];
     }
 }

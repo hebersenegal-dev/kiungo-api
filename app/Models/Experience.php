@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Notifications\NewProjectForStructure;
+use Illuminate\Support\Facades\Notification;
 
 class Experience extends Model
 {
+
     use HasFactory;
 
     protected $fillable = [
@@ -69,6 +71,17 @@ class Experience extends Model
         'start_date' => 'date',
         'end_date' => 'date',
     ];
+
+    protected static function booted()
+  {
+      static::created(function ($experience) {
+          if ($experience->structure_id && $experience->structure) {
+              Notification::send($experience->structure, new NewProjectForStructure($experience));
+          }
+      });
+  }
+
+
 
     public function user()
     {
