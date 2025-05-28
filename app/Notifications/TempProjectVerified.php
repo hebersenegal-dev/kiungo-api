@@ -32,12 +32,13 @@ class TempProjectVerified extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->subject('Nouveau projet temporaire à valider')
-            ->line("Un nouveau projet temporaire intitulé \"{$this->tempProject->title}\" a été ajouté.")
-    }
+     public function toMail($notifiable): MailMessage
+   {
+       return (new MailMessage)
+           ->subject('Nouveau projet temporaire à valider')
+           ->line("Un nouveau projet temporaire intitulé \"{$this->tempProject->title}\" a été ajouté.");
+   }
+
 
     /**
      * Get the array representation of the notification.
