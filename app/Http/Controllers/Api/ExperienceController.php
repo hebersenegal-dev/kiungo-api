@@ -112,7 +112,7 @@ public function show($id)
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
 
-            'structure_id' => 'nullable|exists:users,id',
+            'structure_id' => 'required|exists:users,id',
             'structure.name' => 'required_without:structure_id|string',
             'structure.sector' => 'required_without:structure_id|string',
             'structure.country_id' => 'required_without:structure_id|exists:countries,id',

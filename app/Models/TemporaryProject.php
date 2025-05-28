@@ -15,6 +15,7 @@ class TemporaryProject extends Model
         'start_date',
         'end_date',
         'temp_structure_id',
+        'structure_id',
         'website',
         'project_image',
         'added_by',
