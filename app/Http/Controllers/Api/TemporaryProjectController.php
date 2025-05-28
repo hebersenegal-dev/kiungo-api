@@ -49,13 +49,15 @@ class TemporaryProjectController extends Controller
         'end_date' => 'required|date|after_or_equal:start_date',
         'temp_structure_id' => 'required|exists:temporary_structures,id',
         'website' => 'nullable|url',
-        'project_image' => 'nullable|image|max:2048', // Max 2MB
+        'project_image' => 'nullable|image|max:2048',
     ]);
 
     $imagePath = null;
 
     if ($request->hasFile('project_image')) {
-        $imagePath = $request->file('project_image')->store('project_images', 'public');
+        $file = $request->file('project_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $imagePath = $file->storeAs('project_images', $filename, 'public');
     }
 
     $project = TemporaryProject::create([
@@ -72,7 +74,7 @@ class TemporaryProjectController extends Controller
 
     return response()->json([
         'message' => 'Projet temporaire créé.',
-        'project' => $project->load('tempStructure') // include related structure
+        'project' => $project->load('tempStructure')
     ], 201);
 }
 
