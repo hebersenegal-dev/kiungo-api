@@ -21,7 +21,7 @@ class ExperienceSeeder extends Seeder
             'user_id' => 2,
             'temp_structure_id' => 1,
             'temp_project_id' => 1,
-            'title' => 'Conducteur de travaux',
+            'title' => 'ARtak',
             'role' => 'concept_artist',
             'start_date' => '2023-05-15',
             'end_date' => '2023-12-15',

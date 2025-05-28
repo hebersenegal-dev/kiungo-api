@@ -136,9 +136,8 @@ public function structureProjects()
         return response()->json(['error' => 'Non autorisé.'], 403);
     }
 
-    // Fetch all temporary projects where temp_structure_id matches the structure (user) ID
-    $projects = TemporaryProject::where('temp_structure_id', $user->id)
-        ->with('tempStructure')
+    $projects = TemporaryProject::where('structure_id', $user->id)
+        ->with('structure')
         ->get();
 
     return response()->json($projects);

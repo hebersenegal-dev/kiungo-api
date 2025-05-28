@@ -28,6 +28,5 @@ class UserActivated extends Notification
         return (new \Illuminate\Notifications\Messages\MailMessage)
             ->subject('Votre compte est vérifié')
             ->line('Félicitations ! Votre compte a été vérifié avec succès.')
-            ->action('Voir votre profil', url('/profile'));
     }
 }
