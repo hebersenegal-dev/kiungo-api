@@ -7,18 +7,34 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\UserActivated;
+use App\Notifications\TempStructureVerified;
 
 class User extends Authenticatable
 {
 
   protected static function booted()
-{
-    static::updating(function ($user) {
-        if ($user->isDirty('is_verified') && $user->is_verified) {
-            $user->notify(new UserActivated());
-        }
-    });
-}
+  {
+      static::updating(function ($user) {
+          if ($user->isDirty('is_verified') && $user->is_verified) {
+              $user->notify(new UserActivated());
+
+              if (
+                  $user->role === 'structure' &&
+                  $user->temporary_structure_id
+              ) {
+                  $tempStructure = $user->temporaryStructure;
+
+                  if ($tempStructure && $tempStructure->added_by) {
+                      $creator = User::find($tempStructure->added_by);
+                      if ($creator) {
+                          $creator->notify(new TempStructureVerified());
+                      }
+                  }
+              }
+          }
+      });
+  }
+
 
     use HasFactory, Notifiable, HasApiTokens;
 
@@ -87,6 +103,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Experience::class);
     }
+
+    public function awards()
+ {
+    return $this->hasMany(Award::class);
+ }
 
     public function getProfilePictureUrlAttribute()
     {

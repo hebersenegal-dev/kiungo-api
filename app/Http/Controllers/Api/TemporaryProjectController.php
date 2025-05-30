@@ -30,11 +30,13 @@ class TemporaryProjectController extends Controller
 }
 
 
-    public function show($id)
-    {
-        $project = TemporaryProject::with('tempStructure')->findOrFail($id);
-        return response()->json($project);
-    }
+public function show($id)
+{
+  $project = TemporaryProject::with(['tempStructure', 'addedBy'])->findOrFail($id);
+
+  return response()->json($project);
+}
+
 
     public function store(Request $request)
 {
