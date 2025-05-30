@@ -19,6 +19,7 @@ class UserController extends Controller
     }
 
     public function show($id)
+<<<<<<< HEAD
     {
         $user = User::with([
             'country',
@@ -51,10 +52,46 @@ class UserController extends Controller
                     'temp_project' => $experience['temp_project'] ?? null
                 ];
             }, $userData['experiences']);
+=======
+{
+    $user = User::with([
+        'country',
+        'awards',
+        'experiences' => function($query) {
+            $query->with([
+                'structure:id,company_name,sector,country_id,website,profile_picture',
+                'tempStructure:id,company_name,sector,country_id,website',
+                'project:id,title,description,start_date,end_date,website,project_image,is_verified',
+                'tempProject:id,title,description,start_date,end_date,website,project_image'
+            ])
+            ->orderByDesc('start_date')
+            ->orderByDesc('end_date');
+>>>>>>> dab37aa24a391caaed427fc41e2c2763b224b4c4
         }
+    ])->findOrFail($id);
 
-        return response()->json($userData);
+    // Transform the experiences data for cleaner output
+    $userData = $user->toArray();
+
+    if (isset($userData['experiences'])) {
+        $userData['experiences'] = array_map(function($experience) {
+            return [
+                'id' => $experience['id'],
+                'title' => $experience['title'],
+                'role' => $experience['role'],
+                'start_date' => $experience['start_date'],
+                'end_date' => $experience['end_date'],
+                'structure' => $experience['structure'] ?? null,
+                'temp_structure' => $experience['temp_structure'] ?? null,
+                'project' => $experience['project'] ?? null,
+                'temp_project' => $experience['temp_project'] ?? null
+            ];
+        }, $userData['experiences']);
     }
+
+    return response()->json($userData);
+}
+
 
 
     public function updateMe(Request $request)
