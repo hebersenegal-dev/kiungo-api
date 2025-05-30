@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\StructureController;
 use App\Http\Controllers\Api\ProjectMergeController;
 use App\Http\Controllers\Api\TemporaryStructureController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\AwardController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -31,6 +32,13 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [UserController::class, 'show']);
     Route::put('/me', [UserController::class, 'updateMe']);
     Route::post('/{id}/verify', [UserController::class, 'verifyUser']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/users/{id}/awards', [AwardController::class, 'index']); // still needs ID
+    Route::post('/awards', [AwardController::class, 'store']); // new route
+    Route::put('/awards/{awardId}', [AwardController::class, 'update']);
+    Route::delete('/awards/{awardId}', [AwardController::class, 'destroy']);
 });
 
 Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
