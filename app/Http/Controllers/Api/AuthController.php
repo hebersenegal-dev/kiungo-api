@@ -72,7 +72,6 @@ class AuthController extends Controller
             'is_verified' => false,
         ]);
 
-        Mail::to($user->email)->send(new WelcomeMail($user));
 
         $user->sendEmailVerificationNotification();
 
