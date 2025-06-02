@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class AuthController extends Controller
 {
@@ -70,10 +72,14 @@ class AuthController extends Controller
             'is_verified' => false,
         ]);
 
+        Mail::to($user->email)->send(new WelcomeMail($user));
+
         return response()->json([
             'message' => 'Utilisateur enregistré avec succès.',
             'user' => $user
         ], 201);
+
+
     }
 
     public function login(Request $request)
