@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\AwardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill(); 
+    $request->fulfill();
 
     return response()->json(['message' => 'Email verified successfully']);
 })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
