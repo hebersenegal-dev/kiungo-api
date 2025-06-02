@@ -27,9 +27,8 @@ class ProjectMergeController extends Controller
             return response()->json(['message' => 'Projet déjà validé.']);
         }
 
-        // Vérifie que la structure liée est bien fusionnée
-        if (!$temp->temp_structure_id) {
-            return response()->json(['error' => 'Aucune structure temporaire liée au projet.'], 400);
+        if (!$temp->temp_structure_id && !$temp->structure_id ) {
+            return response()->json(['error' => 'Aucune structure liée au projet.'], 400);
         }
 
         $merge = \App\Models\StructureMerge::where('original_id', $temp->temp_structure_id)->first();
@@ -70,7 +69,7 @@ class ProjectMergeController extends Controller
             'notes' => $request->input('notes'),
         ]);
 
-        
+
         \DB::table('experiences')
         ->where('temp_project_id', $temp->id)
         ->update(['project_id' => $project->id]);
