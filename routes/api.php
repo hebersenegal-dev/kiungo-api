@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AwardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
+Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
+
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
