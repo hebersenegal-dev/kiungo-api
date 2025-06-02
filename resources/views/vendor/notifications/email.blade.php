@@ -1,33 +1,18 @@
 <x-mail::message>
-
 {{-- Greeting --}}
 @if (! empty($greeting))
 # {{ $greeting }}
 @else
 @if ($level === 'error')
-# Whoops! / Oups !
+# @lang('Whoops!')
 @else
-# Hello! / Bonjour !
+# @lang('Hello!')
 @endif
 @endif
 
 {{-- Intro Lines --}}
 @foreach ($introLines as $line)
 {{ $line }}
-
-@endforeach
-
-{{-- French Translation --}}
-@foreach ($introLines as $line)
-{{-- You can use a translation file or hardcoded translations here --}}
-{{-- Example: assuming $line contains "Please verify your email." --}}
-@switch($line)
-    @case('Please click the button below to verify your email address.')
-        Cliquez sur le bouton ci-dessous pour vérifier votre adresse e-mail.
-        @break
-    @default
-        {{-- Optional fallback or log missing translations --}}
-@endswitch
 
 @endforeach
 
@@ -40,7 +25,7 @@
     };
 ?>
 <x-mail::button :url="$actionUrl" :color="$color">
-{{ $actionText }} / {{ __('Vérifier l\'adresse email') }}
+{{ $actionText }}
 </x-mail::button>
 @endisset
 
@@ -50,33 +35,24 @@
 
 @endforeach
 
-{{-- French Outro Lines --}}
-@foreach ($outroLines as $line)
-@switch($line)
-    @case('If you did not create an account, no further action is required.')
-        Si vous n'avez pas créé de compte, aucune autre action n'est requise.
-        @break
-    @default
-@endSwitch
-
-@endforeach
-
 {{-- Salutation --}}
 @if (! empty($salutation))
 {{ $salutation }}
 @else
-Regards, / Cordialement,<br>
+@lang('Regards,')<br>
 {{ config('app.name') }}
 @endif
 
 {{-- Subcopy --}}
 @isset($actionText)
 <x-slot:subcopy>
-If you're having trouble clicking the "**{{ $actionText }}**" button, copy and paste the URL below into your web browser:
-Si vous ne parvenez pas à cliquer sur le bouton "**{{ $actionText }}**", copiez et collez l'URL ci-dessous dans votre navigateur :
-
-<span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+@lang(
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
+    [
+        'actionText' => $actionText,
+    ]
+) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
 </x-slot:subcopy>
 @endisset
-
 </x-mail::message>

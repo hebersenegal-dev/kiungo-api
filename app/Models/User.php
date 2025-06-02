@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -116,4 +117,10 @@ class User extends Authenticatable implements MustVerifyEmail
             ? asset('storage/' . $this->profile_picture)
             : null;
     }
+
+    public function sendEmailVerificationNotification()
+{
+    $this->notify(new VerifyEmail());
+}
+
 }
