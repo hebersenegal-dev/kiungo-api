@@ -74,6 +74,8 @@ class AuthController extends Controller
 
         Mail::to($user->email)->send(new WelcomeMail($user));
 
+        $user->sendEmailVerificationNotification();
+
         return response()->json([
             'message' => 'Utilisateur enregistré avec succès.',
             'user' => $user

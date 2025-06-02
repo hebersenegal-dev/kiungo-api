@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\UserActivated;
 use App\Notifications\TempStructureVerified;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
 
   protected static function booted()

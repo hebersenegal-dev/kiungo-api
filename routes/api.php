@@ -16,6 +16,13 @@ use App\Http\Controllers\Api\ProjectMergeController;
 use App\Http\Controllers\Api\TemporaryStructureController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AwardController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); 
+
+    return response()->json(['message' => 'Email verified successfully']);
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
