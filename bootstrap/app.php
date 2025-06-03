@@ -22,8 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // CSRF token validation exceptions (for API routes that need it)
         $middleware->validateCsrfTokens(except: [
             'sanctum/csrf-cookie', // Allow CSRF cookie endpoint
-            'api/auth/login',      // Your login endpoint
-            'api/auth/register',   // Your register endpoint
+            'api/*',   
         ]);
 
         // Sanctum configuration for SPA authentication
