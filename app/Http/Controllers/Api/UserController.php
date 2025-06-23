@@ -18,6 +18,13 @@ class UserController extends Controller
         return response()->json(User::all());
     }
 
+    public function getProfessionals()
+{
+    $professionals = User::where('role', 'professional')->get();
+    return response()->json($professionals);
+}
+
+
     public function show($id)
 {
     $user = User::with([
