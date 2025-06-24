@@ -15,6 +15,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+
         $validated = $request->validate([
             'role' => ['required', Rule::in(['professional', 'structure'])],
             'email' => 'required|email|unique:users,email',
@@ -26,24 +27,6 @@ class AuthController extends Controller
             'last_name' => 'required_if:role,professional',
             'bio' => 'nullable|string',
 
-            // structure fields
-            'company_name' => 'required_if:role,structure',
-            'sector' => [
-                'required_if:role,structure',
-                Rule::in([
-                    'societe_de_production',
-                    'salle_de_cinema',
-                    'centre_culturel',
-                    'bureau_accueil_tournages',
-                    'direction_cinematographie',
-                    'fonds_de_soutien',
-                    'diffuseur_chaine_tv_plateforme',
-                    'association_professionnels',
-                    'festival',
-                    'institution_publique',
-                    'ecole_de_cinema'
-                ])
-            ],
             'profession' => [
                 'required_if:role,professional',
                 Rule::in([
@@ -88,6 +71,26 @@ class AuthController extends Controller
                   'community_manager_video'
                 ])
             ],
+
+            // structure fields
+            'company_name' => 'required_if:role,structure',
+            'sector' => [
+                'required_if:role,structure',
+                Rule::in([
+                    'societe_de_production',
+                    'salle_de_cinema',
+                    'centre_culturel',
+                    'bureau_accueil_tournages',
+                    'direction_cinematographie',
+                    'fonds_de_soutien',
+                    'diffuseur_chaine_tv_plateforme',
+                    'association_professionnels',
+                    'festival',
+                    'institution_publique',
+                    'ecole_de_cinema'
+                ])
+            ],
+
             'website' => 'nullable|url',
             'temporary_structure_id' => 'nullable|exists:temporary_structures,id',
 
@@ -100,6 +103,7 @@ class AuthController extends Controller
             $path = $request->file('profile_picture')->store('profile-pictures', 'public');
         }
 
+
         $user = User::create([
             'role' => $validated['role'],
             'email' => $validated['email'],
@@ -109,6 +113,7 @@ class AuthController extends Controller
             'last_name' => $validated['last_name'] ?? null,
             'company_name' => $validated['company_name'] ?? null,
             'sector' => $validated['sector'] ?? null,
+            'profession' => $validated['profession'] ?? null,
             'website' => $validated['website'] ?? null,
             'bio' => $validated['bio'] ?? null,
             'temporary_structure_id' => $validated['temporary_structure_id'] ?? null,
