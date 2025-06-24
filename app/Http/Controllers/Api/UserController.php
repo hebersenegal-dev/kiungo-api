@@ -19,10 +19,13 @@ class UserController extends Controller
     }
 
     public function getProfessionals()
-{
-    $professionals = User::where('role', 'professional')->get();
-    return response()->json($professionals);
-}
+    {
+        $professionals = User::where('role', 'professional')
+            ->select('first_name', 'last_name', 'country_id', 'profession')
+            ->get();
+
+        return response()->json($professionals);
+    }
 
 
     public function show($id)

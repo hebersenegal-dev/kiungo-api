@@ -20,7 +20,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
 
-Route::get('/users/professionals', [UserController::class, 'getProfessionals']);
+Route::get('/featured-professionals', [UserController::class, 'getProfessionals']);
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();

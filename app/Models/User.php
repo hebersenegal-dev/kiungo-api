@@ -48,6 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'sector',
+        'profession',
         'country_id',
         'website',
         'bio',
@@ -66,6 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'verified_at' => 'datetime',
         'social_medias' => 'array',
         'sector' => 'string',
+        'profession' => 'string',
     ];
 
     protected $appends = ['profile_picture_url'];

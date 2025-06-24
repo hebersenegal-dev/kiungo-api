@@ -32,6 +32,47 @@ return new class extends Migration
         'institution_publique',
         'ecole_de_cinema'
       ])->nullable();
+      $table->enum('profession', [
+        'realisateur',
+      'producteur',
+      'assistant_realisateur',
+      'scripte',
+      'charge_production',
+      'directeur_photographie',
+      'chef_operateur',
+      'cadreur',
+      'cameraman',
+      'assistant_operateur',
+      'premier_assistant_camera',
+      'etalonneur',
+      'ingenieur_son',
+      'chef_operateur_son',
+      'perchiste',
+      'monteur_son',
+      'mixeur',
+      'designer_sonore',
+      'monteur_image',
+      'monteur_effets_speciaux',
+      'motion_designer',
+      'scenariste',
+      'dialoguiste',
+      'documentariste',
+      'animateur_2d',
+      'animateur_3d',
+      'storyboarder',
+      'concept_artist',
+      'journaliste_reporter_images',
+      'regisseur_general',
+      'technicien_broadcasting',
+      'videaste',
+      'technicien_plateau',
+      'operateur_lumiere',
+      'createur_contenu_video',
+      'specialiste_realite_virtuelle',
+      'specialiste_realite_augmentee',
+      'responsable_chaine',
+      'community_manager_video'
+      ])->nullable();
       $table->json('social_medias')->nullable();
       $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
       $table->string('website')->nullable();
