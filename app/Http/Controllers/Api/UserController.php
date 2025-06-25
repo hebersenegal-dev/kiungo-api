@@ -21,14 +21,15 @@ class UserController extends Controller
     public function getProfessionals()
 {
     $professionals = User::where('role', 'professional')
-        ->with('country:id,name') 
-        ->get(['first_name', 'last_name', 'country_id', 'profession', 'profile_picture']);
+        ->with('country:id,name')
+        ->get(['first_name', 'last_name', 'country_id', 'profession', 'profile_picture', 'id']);
 
     // Transform the result to include country name
     $transformed = $professionals->map(function ($user) {
         return [
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
+            'id'=> $user->id,
             'profession' => $user->profession,
             'profile_picture' => $user->profile_picture_url,
             'country' => $user->country?->name,
