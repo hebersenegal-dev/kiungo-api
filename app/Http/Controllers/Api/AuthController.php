@@ -94,7 +94,7 @@ class AuthController extends Controller
             'website' => 'nullable|url',
             'temporary_structure_id' => 'nullable|exists:temporary_structures,id',
 
-            
+
             'profile_picture' => 'nullable|image|max:2048',
         ]);
 
@@ -169,4 +169,30 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function changePassword(Request $request)
+    {
+      
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|min:8|confirmed',
+    ]);
+
+    $user = $request->user();
+
+    // Vérifie si le mot de passe actuel est correct
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json([
+            'message' => 'Le mot de passe actuel est incorrect.'
+        ], 403);
+    }
+
+    // Met à jour le mot de passe
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return response()->json([
+        'message' => 'Mot de passe mis à jour avec succès.'
+    ]);
+  }
 }

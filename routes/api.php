@@ -19,13 +19,9 @@ use App\Http\Controllers\Api\AwardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::redirect('/login', env('FRONT_URL'))->name('login');
-
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.reset');
-
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
-
 Route::get('/featured-professionals', [UserController::class, 'getProfessionals']);
-
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
 
@@ -54,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/awards', [AwardController::class, 'store']);
     Route::put('/awards/{awardId}', [AwardController::class, 'update']);
     Route::delete('/awards/{awardId}', [AwardController::class, 'destroy']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
 });
 
 Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
