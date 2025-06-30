@@ -83,6 +83,7 @@ return new class extends Migration
       $table->unsignedBigInteger('verified_by')->nullable();
       $table->unsignedBigInteger('temporary_structure_id')->nullable();
       $table->timestamps();
+      $table->rememberToken()->after('password');
     });
   }
 

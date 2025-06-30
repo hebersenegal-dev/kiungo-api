@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\UserActivated;
 use App\Notifications\TempStructureVerified;
+use App\Notifications\CustomResetPassword;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -36,6 +37,11 @@ class User extends Authenticatable implements MustVerifyEmail
           }
       });
   }
+
+  public function sendPasswordResetNotification($token)
+{
+    $this->notify(new CustomResetPassword($token));
+}
 
 
     use HasFactory, Notifiable, HasApiTokens;

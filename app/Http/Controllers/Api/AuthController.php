@@ -94,7 +94,7 @@ class AuthController extends Controller
             'website' => 'nullable|url',
             'temporary_structure_id' => 'nullable|exists:temporary_structures,id',
 
-            // optional image
+            
             'profile_picture' => 'nullable|image|max:2048',
         ]);
 

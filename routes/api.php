@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AwardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
-Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
+Route::redirect('/login', env('FRONT_URL'))->name('login');
 
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.reset');
 
