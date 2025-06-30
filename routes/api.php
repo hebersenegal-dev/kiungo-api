@@ -3,7 +3,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\UserController;
@@ -19,6 +19,10 @@ use App\Http\Controllers\Api\AwardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
+
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.reset');
+
+Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
 Route::get('/featured-professionals', [UserController::class, 'getProfessionals']);
 
@@ -46,8 +50,8 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/users/{id}/awards', [AwardController::class, 'index']); // still needs ID
-    Route::post('/awards', [AwardController::class, 'store']); // new route
+    Route::get('/users/{id}/awards', [AwardController::class, 'index']);
+    Route::post('/awards', [AwardController::class, 'store']);
     Route::put('/awards/{awardId}', [AwardController::class, 'update']);
     Route::delete('/awards/{awardId}', [AwardController::class, 'destroy']);
 });
