@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         // Clean up (optional, for reset)
-        User::truncate();
+        //User::truncate();
 
         // Get a random country for assignment
         $countryIds = Country::pluck('id')->toArray();

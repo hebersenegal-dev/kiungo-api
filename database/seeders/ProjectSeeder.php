@@ -12,7 +12,7 @@ class ProjectSeeder extends Seeder
     public function run()
     {
         // Clean up existing projects (optional)
-        Project::truncate();
+        //Project::truncate();
 
         // Get users by role
         $admin = User::where('role', 'admin')->first();
