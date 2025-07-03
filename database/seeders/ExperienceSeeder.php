@@ -1,30 +1,44 @@
 <?php
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use App\Models\Experience;
+use App\Models\User;
+use App\Models\Project;
 
 class ExperienceSeeder extends Seeder
 {
     public function run()
     {
-        Experience::create([
-            'user_id' => 2,
-            'structure_id' => 3,
-            'project_id' => 1,
-            'title' => 'Chef de chantier',
-            'role' => 'concept_artist',
-            'start_date' => '2024-01-15',
-            'end_date' => '2024-06-15',
-        ]);
+        // Delete existing experiences
+        Experience::truncate();
 
-        Experience::create([
-            'user_id' => 2,
-            'temp_structure_id' => 1,
-            'temp_project_id' => 1,
-            'title' => 'ARtak',
-            'role' => 'concept_artist',
-            'start_date' => '2023-05-15',
-            'end_date' => '2023-12-15',
-        ]);
+        // Fetch all professionals (they have roles from the professions list)
+        $professionals = User::where('role', 'professional')->get();
+
+        // Fetch all projects with their associated structure
+        $projects = Project::with('structure')->get();
+
+        if ($professionals->isEmpty() || $projects->isEmpty()) {
+            $this->command->error('Make sure User and Project seeders are run first.');
+            return;
+        }
+
+        foreach ($projects as $project) {
+            // Randomly assign 1–3 professionals per project
+            $assignedUsers = $professionals->random(rand(1, 3));
+
+            foreach ($assignedUsers as $user) {
+                Experience::create([
+                    'user_id' => $user->id,
+                    'structure_id' => $project->structure_id,
+                    'project_id' => $project->id,
+                    'title' => fake()->jobTitle,
+                    'role' => $user->profession, // from professions list
+                    'start_date' => $project->start_date,
+                    'end_date' => $project->end_date,
+                ]);
+            }
+        }
     }
 }

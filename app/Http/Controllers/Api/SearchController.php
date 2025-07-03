@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Models\Experience;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
 {
@@ -13,8 +13,8 @@ class SearchController extends Controller
     {
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
-            'profession' => ['nullable', 'string', Rule::in(Experience::ROLES)],
-            'structure' => 'nullable|string|max:255',
+            'profession' => 'nullable',
+            'structure' => 'nullable',
             'country' => 'nullable|string|max:255'
         ]);
 
@@ -25,97 +25,104 @@ class SearchController extends Controller
                 'country'
             ]);
 
-        // Full name search (first_name + last_name)
-        if ($request->has('name')) {
-            $query->where(function($q) use ($request) {
-                $q->where('first_name', 'like', '%'.$request->name.'%')
-                  ->orWhere('last_name', 'like', '%'.$request->name.'%');
+        // Full name search
+        if ($request->filled('name')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%');
             });
         }
 
-        // Profession filter using your ROLES enum
-        if ($request->has('profession')) {
-            $query->whereHas('experiences', function($q) use ($request) {
-                $q->where('role', $request->profession);
-            });
+        // Multiple professions (OR condition)
+        $professions = $request->get('profession');
+        if ($professions) {
+            $professionsArray = is_array($professions) ? $professions : explode(',', $professions);
+            $query->whereIn('profession', $professionsArray);
         }
 
-        // Structure search (both official and temporary)
-        if ($request->has('structure')) {
-            $query->whereHas('experiences', function($q) use ($request) {
-                $q->whereHas('structure', function($q) use ($request) {
-                    $q->where('company_name', 'like', '%'.$request->structure.'%');
-                })->orWhereHas('tempStructure', function($q) use ($request) {
-                    $q->where('company_name', 'like', '%'.$request->structure.'%');
+        // Multiple structures (OR condition)
+        $structures = $request->get('structure');
+        if ($structures) {
+            $structuresArray = is_array($structures) ? $structures : explode(',', $structures);
+            $query->whereHas('experiences', function ($q) use ($structuresArray) {
+                $q->where(function ($q2) use ($structuresArray) {
+                    foreach ($structuresArray as $structure) {
+                        $q2->orWhereHas('structure', function ($sq) use ($structure) {
+                            $sq->where('company_name', 'like', '%' . $structure . '%');
+                        })->orWhereHas('tempStructure', function ($sq) use ($structure) {
+                            $sq->where('company_name', 'like', '%' . $structure . '%');
+                        });
+                    }
                 });
             });
         }
 
         // Country filter
         if ($request->has('country')) {
-            $query->whereHas('country', function($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->country.'%');
+            $query->whereHas('country', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->country . '%');
             });
         }
 
         return response()->json([
             'professionals' => $query->paginate(15),
-            'filters' => $validated
+            'filters' => $request->all()
         ]);
     }
 
     public function autocompleteName(Request $request)
-{
-    $term = $request->get('query');
+    {
+        $term = $request->get('query');
 
-    $query = User::where('role', 'professional');
+        $query = User::where('role', 'professional');
 
-
-    if ($term) {
-        $query->where(function ($q) use ($term) {
-            $q->where('first_name', 'like', "%$term%")
-              ->orWhere('last_name', 'like', "%$term%")
-              ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$term%"]);
-        });
-    }
-
-
-    if ($request->has('country')) {
-        $query->whereHas('country', function ($q) use ($request) {
-            $q->where('name', 'like', '%'.$request->country.'%');
-        });
-    }
-
-
-    if ($request->has('profession')) {
-        $query->whereHas('experiences', function ($q) use ($request) {
-            $q->where('role', $request->profession);
-        });
-    }
-
-
-    if ($request->has('structure')) {
-        $query->whereHas('experiences', function ($q) use ($request) {
-            $q->whereHas('structure', function ($q) use ($request) {
-                $q->where('company_name', 'like', '%'.$request->structure.'%');
-            })->orWhereHas('tempStructure', function ($q) use ($request) {
-                $q->where('company_name', 'like', '%'.$request->structure.'%');
+        if ($term) {
+            $query->where(function ($q) use ($term) {
+                $q->where('first_name', 'like', "%$term%")
+                    ->orWhere('last_name', 'like', "%$term%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$term%"]);
             });
-        });
+        }
+
+        // Country filter
+        if ($request->has('country')) {
+            $query->whereHas('country', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->country . '%');
+            });
+        }
+
+        // Multiple professions (OR)
+        $professions = $request->get('profession');
+        if ($professions) {
+            $professionsArray = is_array($professions) ? $professions : explode(',', $professions);
+            $query->whereIn('profession', $professionsArray);
+        }
+
+        // Multiple structures (OR)
+        $structures = $request->get('structure');
+        if ($structures) {
+            $structuresArray = is_array($structures) ? $structures : explode(',', $structures);
+            $query->whereHas('experiences', function ($q) use ($structuresArray) {
+                $q->where(function ($q2) use ($structuresArray) {
+                    foreach ($structuresArray as $structure) {
+                        $q2->orWhereHas('structure', function ($sq) use ($structure) {
+                            $sq->where('company_name', 'like', '%' . $structure . '%');
+                        })->orWhereHas('tempStructure', function ($sq) use ($structure) {
+                            $sq->where('company_name', 'like', '%' . $structure . '%');
+                        });
+                    }
+                });
+            });
+        }
+
+        $results = $query->limit(10)->get()->map(function ($user) {
+            return [
+                'name' => $user->first_name . ' ' . $user->last_name,
+                'profile_picture' => $user->profile_picture ? asset('storage/' . $user->profile_picture) : null,
+                'user_id' => $user->id,
+            ];
+        })->unique()->values();
+
+        return response()->json($results);
     }
-
-    $results = $query->limit(10)->get()->map(function ($user) {
-      return [
-           'name' => $user->first_name . ' ' . $user->last_name,
-           'profile_picture' => $user->profile_picture ? asset('storage/' . $user->profile_picture) : null,
-           'user_id'=> $user->id,
-       ];
-
-    })->unique()->values();
-
-    return response()->json($results);
-}
-
-
-
 }
