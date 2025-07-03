@@ -5,13 +5,16 @@ use Illuminate\Database\Seeder;
 use App\Models\Experience;
 use App\Models\User;
 use App\Models\Project;
+use Illuminate\Support\Facades\Mail;
 
 class ExperienceSeeder extends Seeder
 {
     public function run()
     {
+
+        Mail::fake();
         // Delete existing experiences
-        Experience::truncate();
+        //Experience::truncate();
 
         // Fetch all professionals (they have roles from the professions list)
         $professionals = User::where('role', 'professional')->get();
