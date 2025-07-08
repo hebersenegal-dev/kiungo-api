@@ -22,7 +22,7 @@ class UserController extends Controller
 {
     $professionals = User::where('role', 'professional')
         ->with('country:id,name')
-        ->get(['first_name', 'last_name', 'country_id', 'profession', 'profile_picture', 'id']);
+        ->get(['first_name', 'last_name', 'country_id', 'profession', 'profile_picture', 'id', 'is_verified']);
 
     // Transform the result to include country name
     $transformed = $professionals->map(function ($user) {
@@ -33,6 +33,7 @@ class UserController extends Controller
             'profession' => $user->profession,
             'profile_picture' => $user->profile_picture_url,
             'country' => $user->country?->name,
+            'is_verified' => $user->is_verified,
         ];
     });
 
