@@ -17,12 +17,15 @@ class StructureController extends Controller
         return response()->json($structures);
     }
 
-    public function show($id)
+        public function show($id)
     {
-        $structure = User::where('role', 'structure')->findOrFail($id);
+        $structure = User::where('role', 'structure')
+                         ->with('createdProjects')
+                         ->findOrFail($id);
 
         return response()->json($structure);
     }
+
 
     public function update(Request $request, $id)
     {
