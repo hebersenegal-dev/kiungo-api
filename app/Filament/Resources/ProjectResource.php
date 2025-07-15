@@ -54,7 +54,7 @@ class ProjectResource extends Resource
                 ->label('Structure')
                 ->options(fn () => User::where('role', 'structure')
                     ->get()
-                    ->mapWithKeys(fn ($user) => [$user->id => $user->first_name . ' ' . $user->last_name]))
+                    ->mapWithKeys(fn ($user) => [$user->id => $user->company_name . ' ' . $user->last_name]))
                 ->searchable()
                 ->required(),
 
@@ -80,7 +80,7 @@ class ProjectResource extends Resource
                 ->searchable()
                 ->sortable(),
 
-            TextColumn::make('structure.first_name')
+            TextColumn::make('structure.company_name')
                 ->label('Structure')
                 ->sortable()
                 ->searchable(),
