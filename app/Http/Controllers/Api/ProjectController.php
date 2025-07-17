@@ -24,13 +24,7 @@ class ProjectController extends Controller
 
     public function getProjectsByStructure($structureId)
 {
-    $user = Auth::user();
-
-    // Optional: Only allow admin or self-access
-    if ($user->role !== 'admin' && $user->id != $structureId) {
-        return response()->json(['error' => 'Non autorisé.'], 403);
-    }
-
+  
     $projects = Project::with('structure')
         ->where('structure_id', $structureId)
         ->get();
