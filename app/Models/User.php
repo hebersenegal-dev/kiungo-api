@@ -61,6 +61,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_verified',
         'verified_at',
         'verified_by',
+        'email_verified_at',
         'temporary_structure_id',
         'profile_picture',
         'social_medias',
@@ -74,6 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'social_medias' => 'array',
         'sector' => 'string',
         'profession' => 'string',
+        'email_verified_at' => 'datetime',
     ];
 
     protected $appends = ['profile_picture_url'];
@@ -130,5 +132,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     $this->notify(new VerifyEmail());
 }
+
+public function hasVerifiedEmail()
+  {
+      return !is_null($this->email_verified_at);
+  }
 
 }
