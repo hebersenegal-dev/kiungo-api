@@ -179,36 +179,63 @@ public function myProjects()
     return response()->json($projects);
 }
 
-// In your ProjectController, add this method:
 public function getProjectProfessionals($projectId)
 {
+    \Log::info('getProjectProfessionals called with projectId: ' . $projectId);
+
     try {
-        $project = Project::with(['professionals' => function($query) {
-            $query->select(
-                'users.id',
-                'users.first_name',
-                'users.last_name',
-                'users.profession',
-                'users.profile_picture',
-                'users.profile_picture_url'
-            );
-        }])->findOrFail($projectId);
+        // Check if project exists
+        $project = Project::find($projectId);
 
-        // Format the response
-        $professionals = $project->professionals->map(function($professional) {
+        if (!$project) {
+            \Log::error('Project not found: ' . $projectId);
+            return response()->json(['error' => 'Project not found'], 404);
+        }
+
+        \Log::info('Project found: ' . $project->title);
+
+        // Get experiences for this project (both regular and temp projects)
+        $experiences = Experience::where(function($query) use ($projectId) {
+            $query->where('project_id', $projectId)
+                  ->orWhere('temp_project_id', $projectId);
+        })
+        ->with(['user' => function($query) {
+            $query->select('id', 'first_name', 'last_name', 'profession', 'profile_picture', 'profile_picture_url', 'role')
+                  ->where('role', 'professional');
+        }])
+        ->get();
+
+        \Log::info('Experiences found: ' . $experiences->count());
+
+        $professionals = $experiences->map(function($experience) {
+            if (!$experience->user) {
+                \Log::warning('Experience found without user: ' . $experience->id);
+                return null;
+            }
+
             return [
-                'id' => $professional->id,
-                'first_name' => $professional->first_name,
-                'last_name' => $professional->last_name,
+                'id' => $experience->user->id,
+                'first_name' => $experience->user->first_name,
+                'last_name' => $experience->user->last_name,
+                'profession' => $experience->user->profession,
+                'profile_picture_url' => $experience->user->profile_picture_url ?? $experience->user->profile_picture,
+                'full_name' => $experience->user->first_name . ' ' . $experience->user->last_name,
+                'role_on_project' => $experience->role,
             ];
-        });
+        })->filter(); // Remove null values
 
-        return response()->json($professionals);
+        \Log::info('Professionals processed: ' . $professionals->count());
 
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json(['error' => 'Project not found'], 404);
+        return response()->json($professionals->values());
+
     } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to fetch professionals'], 500);
+        \Log::error('Error in getProjectProfessionals: ' . $e->getMessage());
+        \Log::error($e->getTraceAsString());
+
+        return response()->json([
+            'error' => 'Failed to fetch professionals',
+            'message' => $e->getMessage()
+        ], 500);
     }
 }
 
