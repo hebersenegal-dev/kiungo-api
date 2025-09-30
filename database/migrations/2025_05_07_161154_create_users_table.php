@@ -80,6 +80,7 @@ return new class extends Migration
       $table->string('profile_picture')->nullable();
       $table->boolean('is_verified')->default(false);
       $table->timestamp('verified_at')->nullable();
+      $table->timestamp('email_verified_at')->nullable();
       $table->unsignedBigInteger('verified_by')->nullable();
       $table->unsignedBigInteger('temporary_structure_id')->nullable();
       $table->timestamps();

@@ -39,6 +39,14 @@ class Project extends Model
         return $this->belongsTo(User::class, 'structure_id');
     }
 
+    public function professionals()
+    {
+        return $this->belongsToMany(User::class, 'experiences', 'project_id', 'user_id')
+                    ->withPivot('role', 'title', 'start_date', 'end_date')
+                    ->where('users.role', 'professional')
+                    ->withTimestamps();
+    }
+
     // Relationship to the creator
     public function creator()
     {

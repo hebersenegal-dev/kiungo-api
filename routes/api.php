@@ -65,6 +65,7 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::delete('/{id}', [ProjectController::class, 'destroy']);
     Route::post('/{id}/verify', [ProjectController::class, 'verify']);
     Route::get('/structures/{structureId}', [ProjectController::class, 'getProjectsByStructure']);
+    Route::get('/projects/{projectId}/professionals', [ProjectController::class, 'getProjectProfessionals']);
 });
 
 Route::prefix('temporary-projects')->middleware('auth:sanctum')->group(function () {

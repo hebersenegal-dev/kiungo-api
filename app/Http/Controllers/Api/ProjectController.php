@@ -24,7 +24,7 @@ class ProjectController extends Controller
 
     public function getProjectsByStructure($structureId)
 {
-  
+
     $projects = Project::with('structure')
         ->where('structure_id', $structureId)
         ->get();
@@ -177,6 +177,39 @@ public function myProjects()
         ->get();
 
     return response()->json($projects);
+}
+
+// In your ProjectController, add this method:
+public function getProjectProfessionals($projectId)
+{
+    try {
+        $project = Project::with(['professionals' => function($query) {
+            $query->select(
+                'users.id',
+                'users.first_name',
+                'users.last_name',
+                'users.profession',
+                'users.profile_picture',
+                'users.profile_picture_url'
+            );
+        }])->findOrFail($projectId);
+
+        // Format the response
+        $professionals = $project->professionals->map(function($professional) {
+            return [
+                'id' => $professional->id,
+                'first_name' => $professional->first_name,
+                'last_name' => $professional->last_name,
+            ];
+        });
+
+        return response()->json($professionals);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['error' => 'Project not found'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to fetch professionals'], 500);
+    }
 }
 
 
