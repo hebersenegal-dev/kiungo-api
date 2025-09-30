@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Experience;
+use App\Models\User;
 use App\Models\ProjectMerge;
+use App\Models\TemporaryProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -200,7 +203,7 @@ public function getProjectProfessionals($projectId)
                   ->orWhere('temp_project_id', $projectId);
         })
         ->with(['user' => function($query) {
-            $query->select('id', 'first_name', 'last_name', 'profession', 'profile_picture', 'profile_picture_url', 'role')
+            $query->select('id', 'first_name', 'last_name', 'profession', 'role')
                   ->where('role', 'professional');
         }])
         ->get();
@@ -218,8 +221,6 @@ public function getProjectProfessionals($projectId)
                 'first_name' => $experience->user->first_name,
                 'last_name' => $experience->user->last_name,
                 'profession' => $experience->user->profession,
-                'profile_picture_url' => $experience->user->profile_picture_url ?? $experience->user->profile_picture,
-                'full_name' => $experience->user->first_name . ' ' . $experience->user->last_name,
                 'role_on_project' => $experience->role,
             ];
         })->filter(); // Remove null values
