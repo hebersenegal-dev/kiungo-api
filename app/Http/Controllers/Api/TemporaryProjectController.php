@@ -147,6 +147,23 @@ public function structureProjects()
     return response()->json($projects);
 }
 
+public function structureTempProjects($id)
+{
+    $user = Auth::user();
+
+
+    if ($user->role !== 'structure') {
+        return response()->json(['error' => 'Non autorisé.'], 403);
+    }
+
+    $projects = TemporaryProject::where('structure_id', $structureId)
+        ->with('structure')
+        ->get();
+
+    return response()->json($projects);
+}
+
+
 
 public function update(Request $request, $id)
 {
