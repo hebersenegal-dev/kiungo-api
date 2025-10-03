@@ -151,7 +151,7 @@ public function structureTempProjects($id)
 {
 
 
-    $projects = TemporaryProject::where('structure_id', $structureId)
+    $projects = TemporaryProject::where('structure_id', $id)
         ->with('structure')
         ->get();
 
