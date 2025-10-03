@@ -188,6 +188,20 @@ public function update(Request $request, $id)
     ]);
 }
 
+public function projectsByTemporaryStructure($tempStructureId)
+{
+    // Ensure user is authenticated
+    $user = Auth::user();
+    if (!$user) {
+        return response()->json(['error' => 'Non authentifié.'], 401);
+    }
+
+    $projects = TemporaryProject::where('temp_structure_id', $tempStructureId)
+        ->with(['tempStructure', 'addedBy'])
+        ->get();
+
+    return response()->json($projects);
+}
 
 
 

@@ -75,6 +75,7 @@ Route::prefix('temporary-projects')->middleware('auth:sanctum')->group(function 
     Route::post('/', [TemporaryProjectController::class, 'store']);
     Route::post('/{id}/verify', [TemporaryProjectController::class, 'verify']);
     Route::put('/{id}', [TemporaryProjectController::class, 'update']);
+    Route::get('/temporary-structures/{id}/projects',[TemporaryProjectController::class, 'projectsByTemporaryStructure']);
 });
 
 Route::prefix('experiences')->middleware('auth:sanctum')->group(function () {
