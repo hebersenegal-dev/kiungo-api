@@ -48,4 +48,26 @@ class PasswordResetController extends Controller
             ? response()->json(['message' => 'Mot de passe réinitialisé avec succès.'])
             : response()->json(['message' => 'Échec de la réinitialisation du mot de passe.'], 500);
     }
+
+    public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'password' => 'required|confirmed|min:8',
+    ]);
+
+    $user = auth()->user();
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        throw ValidationException::withMessages([
+            'current_password' => ['Le mot de passe actuel est incorrect.'],
+        ]);
+    }
+
+    $user->forceFill([
+        'password' => Hash::make($request->password),
+    ])->save();
+
+    return response()->json(['message' => 'Mot de passe modifié avec succès.']);
+}
 }

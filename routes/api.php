@@ -24,6 +24,7 @@ Route::get('/login', function () {
 });
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.reset');
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+Route::post('/change-password', [PasswordResetController::class, 'changePassword'])->middleware('auth:sanctum');
 Route::get('/featured-professionals', [UserController::class, 'getProfessionals']);
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
