@@ -22,6 +22,9 @@ Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
 Route::get('/login', function () {
     return Redirect::to(env('LOGIN_TO_FRONT'));
 });
+Route::post('/send-otp', [PasswordResetController::class, 'sendOtp']);
+Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp']);
+Route::post('/reset-password-otp', [PasswordResetController::class, 'resetWithOtp']);
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.reset');
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 Route::post('/change-password', [PasswordResetController::class, 'changePassword'])->middleware('auth:sanctum');
