@@ -16,12 +16,15 @@ use App\Http\Controllers\Api\ProjectMergeController;
 use App\Http\Controllers\Api\TemporaryStructureController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AwardController;
+use App\Http\Controllers\Api\ContactFormController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::redirect('/login', env('LOGIN_TO_FRONT'))->name('login');
 Route::get('/login', function () {
     return Redirect::to(env('LOGIN_TO_FRONT'));
 });
+Route::post('/contact', [ContactFormController::class, 'sendContactEmail']);
+
 Route::post('/send-otp', [PasswordResetController::class, 'sendOtp']);
 Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp']);
 Route::post('/reset-password-otp', [PasswordResetController::class, 'resetWithOtp']);
