@@ -105,6 +105,7 @@ Route::prefix('structure-merges')->middleware('auth:sanctum')->group(function ()
 
 Route::prefix('project-merges')->middleware('auth:sanctum')->group(function () {
     Route::post('/{tempProjectId}/verify', [ProjectMergeController::class, 'verify']);
+     Route::post('/{tempProjectId}/reject', [ProjectMergeController::class, 'reject']);
 });
 
 Route::prefix('temporary-structures')->middleware('auth:sanctum')->group(function () {

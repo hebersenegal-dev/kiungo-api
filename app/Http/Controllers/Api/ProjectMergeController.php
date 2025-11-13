@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\TemporaryProject;
+use App\Notifications\TempProjectRejected;
 use App\Models\Project;
 use App\Models\ProjectMerge;
 use App\Models\User;
@@ -80,4 +81,40 @@ class ProjectMergeController extends Controller
             'project' => $project
         ]);
     }
+
+    public function reject(Request $request, $tempProjectId)
+    {
+        $user = Auth::user();
+
+        // Only admin or structure can reject a project
+        if (!in_array($user->role, ['admin', 'structure'])) {
+            return response()->json(['error' => 'Non autorisé.'], 403);
+        }
+
+        // Validate rejection reason
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        // Find the temporary project
+        $temp = TemporaryProject::findOrFail($tempProjectId);
+        $creator = User::find($temp->added_by); // ✅ changed here
+
+        // Save the rejection reason
+        $reason = $validated['reason'];
+
+        // Delete the temporary project
+        $temp->delete();
+
+        // Notify the creator if exists
+        if ($creator) {
+            $creator->notify(new \App\Notifications\TempProjectRejected($temp, $reason));
+        }
+
+        return response()->json([
+            'message' => 'Le projet temporaire a été rejeté et supprimé avec succès.',
+            'notified_user' => $creator ? $creator->email : null, // ✅ optional, for info
+        ]);
+    }
+
 }

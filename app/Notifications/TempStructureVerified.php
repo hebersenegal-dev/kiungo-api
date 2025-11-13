@@ -19,7 +19,7 @@ class TempStructureVerified extends Notification
     {
         return [
             'title' => 'Structure vérifiée',
-            'message' => 'Une structure que aviez mentionne est officellement sur la plateforme.',
+            'message' => 'Une structure que vous aviez mentionne est officellement sur la plateforme.',
         ];
     }
 
