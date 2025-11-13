@@ -13,29 +13,31 @@ use Illuminate\Support\Facades\Auth;
 class TemporaryProjectController extends Controller
 {
   public function index()
-{
-  $user = Auth::user();
+  {
+      $user = Auth::user();
 
+      if ($user->role !== 'structure') {
+          return response()->json(['error' => 'Non autorisé.'], 403);
+      }
 
-  if ($user->role !== 'structure') {
-      return response()->json(['error' => 'Non autorisé.'], 403);
+      // ✅ Return only unverified temporary projects
+      $projects = TemporaryProject::where('temp_structure_id', $user->id)
+          ->where('is_verified', false) // ← only projects not yet verified
+          ->with('tempStructure')
+          ->get();
+
+      return response()->json($projects);
   }
 
-  $projects = TemporaryProject::where('temp_structure_id', $user->id)
-      ->where('is_verified', false)
-      ->with('tempStructure')
-      ->get();
 
-  return response()->json($projects);
-}
+  public function show($id)
+      {
+          $project = TemporaryProject::with(['tempStructure', 'addedBy'])
+              ->where('is_verified', false)
+              ->findOrFail($id);
 
-
-public function show($id)
-{
-  $project = TemporaryProject::with(['tempStructure', 'addedBy'])->findOrFail($id);
-
-  return response()->json($project);
-}
+          return response()->json($project);
+      }
 
 
     public function store(Request $request)
@@ -133,30 +135,31 @@ public function verify(Request $request, $id)
 }
 
 public function structureProjects()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user->role !== 'structure') {
-        return response()->json(['error' => 'Non autorisé.'], 403);
+        if ($user->role !== 'structure') {
+            return response()->json(['error' => 'Non autorisé.'], 403);
+        }
+
+        $projects = TemporaryProject::where('structure_id', $user->id)
+            ->where('is_verified', false)
+            ->with('structure')
+            ->get();
+
+        return response()->json($projects);
     }
 
-    $projects = TemporaryProject::where('structure_id', $user->id)
-        ->with('structure')
-        ->get();
 
-    return response()->json($projects);
-}
+    public function structureTempProjects($id)
+       {
+           $projects = TemporaryProject::where('structure_id', $id)
+               ->where('is_verified', false)
+               ->with('structure')
+               ->get();
 
-public function structureTempProjects($id)
-{
-
-
-    $projects = TemporaryProject::where('structure_id', $id)
-        ->with('structure')
-        ->get();
-
-    return response()->json($projects);
-}
+           return response()->json($projects);
+       }
 
 
 
@@ -201,20 +204,19 @@ public function update(Request $request, $id)
 }
 
 public function projectsByTemporaryStructure($tempStructureId)
-{
-    // Ensure user is authenticated
-    $user = Auth::user();
-    if (!$user) {
-        return response()->json(['error' => 'Non authentifié.'], 401);
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Non authentifié.'], 401);
+        }
+
+        $projects = TemporaryProject::where('temp_structure_id', $tempStructureId)
+            ->where('is_verified', false)
+            ->with(['tempStructure', 'addedBy'])
+            ->get();
+
+        return response()->json($projects);
     }
-
-    $projects = TemporaryProject::where('temp_structure_id', $tempStructureId)
-        ->with(['tempStructure', 'addedBy'])
-        ->get();
-
-    return response()->json($projects);
-}
-
 
 
 }
