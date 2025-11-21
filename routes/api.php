@@ -25,6 +25,14 @@ Route::get('/login', function () {
 });
 Route::post('/contact', [ContactFormController::class, 'sendContactEmail']);
 
+Route::post('/update-fcm-token', function (Request $request) {
+    $user = $request->user();
+    $user->fcm_token = $request->fcm_token;
+    $user->save();
+
+    return response()->json(['message' => 'Token updated']);
+})->middleware('auth:sanctum');
+
 Route::post('/send-otp', [PasswordResetController::class, 'sendOtp']);
 Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp']);
 Route::post('/reset-password-otp', [PasswordResetController::class, 'resetWithOtp']);

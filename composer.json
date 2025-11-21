@@ -10,6 +10,7 @@
         "dedoc/scramble": "^0.12.19",
         "filament/filament": "^3.3",
         "guzzlehttp/guzzle": "^7.9",
+        "kreait/firebase-php": "^5.26",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",

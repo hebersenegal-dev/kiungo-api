@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Notifications;
+
 use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UserActivated extends Notification
+class UserActivated extends Notification implements ShouldQueue
 {
     use Queueable;
-
 
     public function via($notifiable)
     {
@@ -18,7 +19,6 @@ class UserActivated extends Notification
     public function toArray($notifiable)
     {
         return [
-
             'title' => 'Vérification du compte',
             'message' => 'Votre compte a été vérifié avec succès.',
         ];
@@ -32,15 +32,14 @@ class UserActivated extends Notification
     }
 
     public function toFcm($notifiable)
-{
-    return [
-        'title' => 'Vérification du compte',
-        'body' => 'Votre compte a été vérifié avec succès.',
-        'data' => [
-            'type' => 'user_activated',
-            'user_id' => $notifiable->id,
-        ],
-    ];
-}
-
+    {
+        return [
+            'title' => 'Vérification du compte',
+            'body' => 'Votre compte a été vérifié avec succès.',
+            'data' => [
+                'type' => 'user_activated',
+                'user_id' => $notifiable->id,
+            ],
+        ];
+    }
 }
