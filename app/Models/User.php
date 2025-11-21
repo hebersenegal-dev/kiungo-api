@@ -24,8 +24,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
             // Send UserActivated notification **queued**
             if ($user->fcm_token) {
-                $user->notify((new UserActivated())->delay(now()->addSeconds(1)));
-            } else {
+      $user->notify(new UserActivated());
+  }
+ else {
                 // Optional: log if user has no token
                 \Log::warning("User {$user->id} verified but has no FCM token.");
             }
