@@ -1,6 +1,5 @@
 <?php
 
 return [
-    'credentials' => env('FIREBASE_CREDENTIALS'),
+  'credentials' => storage_path('app/' . env('FIREBASE_CREDENTIALS')),
 ];
-  
