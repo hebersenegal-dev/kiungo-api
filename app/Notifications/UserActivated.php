@@ -3,13 +3,10 @@
 namespace App\Notifications;
 
 use App\Notifications\Channels\FcmChannel;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UserActivated extends Notification implements ShouldQueue
+class UserActivated extends Notification implements
 {
-    use Queueable;
 
     public function via($notifiable)
     {
