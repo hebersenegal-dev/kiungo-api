@@ -16,26 +16,27 @@ class User extends Authenticatable implements MustVerifyEmail
 {
 
   protected static function booted()
-  {
-      static::updated(function ($user) {
-          // Check if is_verified changed to true
-          if ($user->isDirty('is_verified') && $user->is_verified) {
-              // Send UserActivated notification
-              $user->notify(new UserActivated());
+{
+    static::updated(function ($user) {
+        // Check if is_verified changed to true
+        if ($user->isDirty('is_verified') && $user->is_verified) {
+            // Send UserActivated notification
+            $user->notify(new UserActivated());
 
-              // If structure, notify creator
-              if ($user->role === 'structure' && $user->temporary_structure_id) {
-                  $tempStructure = $user->temporaryStructure;
-                  if ($tempStructure && $tempStructure->added_by) {
-                      $creator = User::find($tempStructure->added_by);
-                      if ($creator) {
-                          $creator->notify(new TempStructureVerified());
-                      }
-                  }
-              }
-          }
-      });
-  }
+            // If structure, notify creator
+            if ($user->role === 'structure' && $user->temporary_structure_id) {
+                $tempStructure = $user->temporaryStructure;
+                if ($tempStructure && $tempStructure->added_by) {
+                    $creator = User::find($tempStructure->added_by);
+                    if ($creator) {
+                        $creator->notify(new TempStructureVerified());
+                    }
+                }
+            }
+        }
+    });
+}
+
 
 
   public function sendPasswordResetNotification($token)
