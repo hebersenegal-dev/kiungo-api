@@ -5,7 +5,7 @@ namespace App\Notifications;
 use App\Notifications\Channels\FcmChannel;
 use Illuminate\Notifications\Notification;
 
-class UserActivated extends Notification implements
+class UserActivated extends Notification
 {
 
     public function via($notifiable)
