@@ -16,37 +16,26 @@ class User extends Authenticatable implements MustVerifyEmail
 {
 
   protected static function booted()
-{
-    static::updating(function ($user) {
+  {
+      static::updated(function ($user) {
+          // Check if is_verified changed to true
+          if ($user->isDirty('is_verified') && $user->is_verified) {
+              // Send UserActivated notification
+              $user->notify(new UserActivated());
 
-        // Check if the user is being verified
-        if ($user->isDirty('is_verified') && $user->is_verified) {
-
-            // Send UserActivated notification **queued**
-            if ($user->fcm_token) {
-      $user->notify(new UserActivated());
+              // If structure, notify creator
+              if ($user->role === 'structure' && $user->temporary_structure_id) {
+                  $tempStructure = $user->temporaryStructure;
+                  if ($tempStructure && $tempStructure->added_by) {
+                      $creator = User::find($tempStructure->added_by);
+                      if ($creator) {
+                          $creator->notify(new TempStructureVerified());
+                      }
+                  }
+              }
+          }
+      });
   }
- else {
-                // Optional: log if user has no token
-                \Log::warning("User {$user->id} verified but has no FCM token.");
-            }
-
-            // If user is a 'structure' and has a temporary structure
-            if ($user->role === 'structure' && $user->temporary_structure_id) {
-                $tempStructure = $user->temporaryStructure;
-
-                if ($tempStructure && $tempStructure->added_by) {
-                    $creator = User::find($tempStructure->added_by);
-                    if ($creator && $creator->fcm_token) {
-                        $creator->notify((new TempStructureVerified())->delay(now()->addSeconds(1)));
-                    } elseif ($creator) {
-                        \Log::warning("Creator {$creator->id} has no FCM token.");
-                    }
-                }
-            }
-        }
-    });
-}
 
 
   public function sendPasswordResetNotification($token)
