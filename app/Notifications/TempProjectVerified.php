@@ -2,14 +2,14 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\TemporaryProject;
+use App\Notifications\Channels\FcmChannel;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TempProjectVerified extends Notification
 {
-    use Queueable;
+
 
     protected TemporaryProject $tempProject;
 
@@ -26,20 +26,19 @@ class TempProjectVerified extends Notification
      */
     public function via($notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', FcmChannel::class];
     }
 
     /**
      * Get the mail representation of the notification.
-     */
-     public function toMail($notifiable): MailMessage
-   {
-       return (new MailMessage)
-           ->subject('Nouveau projet temporaire à valider')
-           ->line("Un nouveau projet temporaire intitulé \"{$this->tempProject->title}\" a été ajouté.");
-   }
 
-
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Nouveau projet temporaire à valider')
+            ->line("Un nouveau projet temporaire intitulé \"{$this->tempProject->title}\" a été ajouté.");
+    }
+   */
     /**
      * Get the array representation of the notification.
      */
@@ -49,6 +48,21 @@ class TempProjectVerified extends Notification
             'title' => 'Nouveau projet temporaire à valider',
             'message' => "Le projet \"{$this->tempProject->title}\" a été soumis pour validation.",
             'temporary_project_id' => $this->tempProject->id,
+        ];
+    }
+
+    /**
+     * FCM push notification payload
+     */
+    public function toFcm($notifiable): array
+    {
+        return [
+            'title' => 'Nouveau projet temporaire à valider',
+            'body'  => "Le projet \"{$this->tempProject->title}\" a été soumis pour validation.",
+            'data'  => [
+                'type' => 'temp_project_verified',
+                'temporary_project_id' => $this->tempProject->id,
+            ],
         ];
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Notifications\Channels\FcmChannel;
 
 class TempProjectRejected extends Notification
 {
-    use Queueable;
+  
 
     protected $project;
     protected $reason;
@@ -23,31 +23,31 @@ class TempProjectRejected extends Notification
     }
 
     /**
-     * Define the channels.
+     * Notification channels.
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', FcmChannel::class];
     }
 
     /**
-     * Store notification data in database.
+     * Database notification.
      */
     public function toArray($notifiable)
     {
         return [
             'title' => 'Projet rejeté',
-            'message' => 'Votre projet temporaire "' . $this->project->title . '" a été rejeté par l’équipe de validation.',
+            'message' => 'Votre projet temporaire "' . $this->project->title . '" a été rejeté.',
             'reason' => $this->reason,
         ];
     }
 
     /**
-     * Send mail notification.
+     * Email notification.
      */
     public function toMail($notifiable)
     {
-        $mail = (new MailMessage)
+        return (new MailMessage)
             ->subject('Votre projet temporaire a été rejeté')
             ->greeting('Bonjour ' . $notifiable->name . ',')
             ->line('Nous vous informons que votre projet temporaire intitulé "' . $this->project->title . '" a été rejeté.')
@@ -55,7 +55,21 @@ class TempProjectRejected extends Notification
             ->line('Vous pouvez soumettre à nouveau votre projet après correction.')
             ->action('Voir vos projets', url('/projects'))
             ->line('Merci de votre compréhension.');
+    }
 
-        return $mail;
+    /**
+     * FCM mobile push notification.
+     */
+    public function toFcm($notifiable)
+    {
+        return [
+            'title' => 'Projet rejeté',
+            'body'  => 'Votre projet "' . $this->project->title . '" a été rejeté.',
+            'data'  => [
+                'type'      => 'temp_project_rejected',
+                'project_id'=> $this->project->id,
+                'reason'    => $this->reason,
+            ],
+        ];
     }
 }
