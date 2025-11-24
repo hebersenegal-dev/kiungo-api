@@ -16,10 +16,16 @@ class ProjectMerge extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'original_id', 'official_id', 'merged_by', 'merged_at', 'notes'
+        'original_id',
+        'official_id',
+        'merged_by',
+        'merged_at',
+        'notes',
     ];
 
-    protected $casts = ['merged_at' => 'datetime'];
+    protected $casts = [
+        'merged_at' => 'datetime',
+    ];
 
     public function original()
     {
@@ -37,21 +43,26 @@ class ProjectMerge extends Model
     }
 
     /**
-     * Booted model hook to notify user when project is merged.
+     * Notify the user when a temporary project is merged into an official one.
      */
-     protected static function booted()
- {
-     static::created(function ($merge) {
-         $tempProject = \App\Models\TemporaryProject::find($merge->original_id);
+    protected static function booted()
+    {
+        static::created(function (ProjectMerge $merge) {
 
-         if ($tempProject && $tempProject->added_by) {
-             $user = \App\Models\User::find($tempProject->added_by);
+            // Get the temporary project
+            $tempProject = TemporaryProject::find($merge->original_id);
+            if (!$tempProject || !$tempProject->added_by) {
+                return;
+            }
 
-             if ($user) {
-                 $user->notify(new \App\Notifications\TempProjectVerified($tempProject, $merge->official_id));
-             }
-         }
-     });
- }
+            // Get the user who added the temporary project
+            $user = User::find($tempProject->added_by);
+            if (!$user) {
+                return;
+            }
 
+            // Notify using mail + database + FCM
+            $user->notify(new TempProjectVerified($tempProject));
+        });
+    }
 }

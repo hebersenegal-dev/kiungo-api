@@ -1,14 +1,13 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Notifications\NewProjectForStructure;
-use Illuminate\Support\Facades\Notification;
 
 class Experience extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
@@ -23,7 +22,6 @@ class Experience extends Model
         'end_date',
     ];
 
-    // Consider defining the enum values as a constant
     public const ROLES = [
         'realisateur',
         'producteur',
@@ -63,25 +61,30 @@ class Experience extends Model
         'specialiste_realite_virtuelle',
         'specialiste_realite_augmentee',
         'responsable_chaine',
-        'community_manager_video'
+        'community_manager_video',
     ];
 
-    // Cast the role enum for better type handling
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
     ];
 
+    /**
+     * Notify a structure when a user adds experience referencing its project.
+     */
     protected static function booted()
-  {
-      static::created(function ($experience) {
-          if ($experience->structure_id && $experience->structure) {
-              Notification::send($experience->structure, new NewProjectForStructure($experience));
-          }
-      });
-  }
+    {
+        static::created(function (Experience $experience) {
 
+            // Check if structure exists
+            $structure = $experience->structure;
 
+            if ($structure) {
+                // Notify structure (mail + database + FCM if available)
+                $structure->notify(new NewProjectForStructure($experience));
+            }
+        });
+    }
 
     public function user()
     {
