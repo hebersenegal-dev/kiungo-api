@@ -79,17 +79,13 @@ class ProjectMergeController extends Controller
         'verified_by' => $user->id,
     ]);
 
-    // Register the merge link if temp_structure_id exists
-    if ($temp->temp_structure_id) {
-        ProjectMerge::create([
-            'original_id' => $temp->id,
-            'official_id' => $project->id,
-            'merged_by' => $user->id,
-            'merged_at' => now(),
-            'notes' => $request->input('notes'),
-        ]);
-    }
-
+    ProjectMerge::create([
+      'original_id' => $temp->id,
+      'official_id' => $project->id,
+      'merged_by' => $user->id,
+      'merged_at' => now(),
+      'notes' => $request->input('notes'),
+  ]);
     // Update related experiences
     \DB::table('experiences')
         ->where('temp_project_id', $temp->id)
