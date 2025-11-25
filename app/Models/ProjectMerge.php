@@ -45,24 +45,25 @@ class ProjectMerge extends Model
     /**
      * Notify the user when a temporary project is merged into an official one.
      */
-    protected static function booted()
-    {
-        static::created(function (ProjectMerge $merge) {
+     protected static function booted()
+ {
+     static::created(function (ProjectMerge $merge) {
 
-            // Get the temporary project
-            $tempProject = TemporaryProject::find($merge->original_id);
-            if (!$tempProject || !$tempProject->added_by) {
-                return;
-            }
+         // Get the temporary project
+         $tempProject = TemporaryProject::find($merge->original_id);
+         if (!$tempProject || !$tempProject->added_by) {
+             return;
+         }
 
-            // Get the user who added the temporary project
-            $user = User::find($tempProject->added_by);
-            if (!$user) {
-                return;
-            }
+         // Get the user who added the temporary project
+         $user = User::find($tempProject->added_by);
+         if (!$user) {
+             return;
+         }
 
-            // Notify using mail + database + FCM
-            $user->notify(new TempProjectVerified($tempProject));
-        });
-    }
+         // Notify using mail + database + FCM
+         $user->notify(new TempProjectVerified($tempProject, $merge->official_id));
+     });
+ }
+
 }
