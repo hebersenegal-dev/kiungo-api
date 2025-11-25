@@ -47,7 +47,13 @@ class ProjectMerge extends Model
      */
      protected static function booted()
  {
+
      static::created(function (ProjectMerge $merge) {
+
+       \Log::info("ProjectMerge created event fired", [
+           'merge_id' => $merge->id,
+           'original_id' => $merge->original_id,
+       ]);
 
          // Get the temporary project
          $tempProject = TemporaryProject::find($merge->original_id);
