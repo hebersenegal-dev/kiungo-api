@@ -8,58 +8,45 @@ use App\Notifications\Channels\FcmChannel;
 
 class TempProjectRejected extends Notification
 {
-  
-
     protected $project;
     protected $reason;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct($project, $reason = null)
     {
         $this->project = $project;
         $this->reason = $reason;
     }
 
-    /**
-     * Notification channels.
-     */
     public function via($notifiable)
     {
         return ['database', 'mail', FcmChannel::class];
     }
 
-    /**
-     * Database notification.
-     */
     public function toArray($notifiable)
     {
         return [
-            'title' => 'Projet rejeté',
-            'message' => 'Votre projet temporaire "' . $this->project->title . '" a été rejeté.',
+            'title_en' => 'Project Rejected',
+            'title_fr' => 'Projet rejeté',
+            'message_en' => 'Your temporary project "' . $this->project->title . '" has been rejected.' . ($this->reason ? ' Reason: ' . $this->reason : ''),
+            'message_fr' => 'Votre projet temporaire "' . $this->project->title . '" a été rejeté.' . ($this->reason ? ' Motif : ' . $this->reason : ''),
             'reason' => $this->reason,
+            'project_id' => $this->project->id,
+            'type' => 'temp_project_rejected',
         ];
     }
 
-    /**
-     * Email notification.
-     */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Votre projet temporaire a été rejeté')
-            ->greeting('Bonjour ' . $notifiable->name . ',')
-            ->line('Nous vous informons que votre projet temporaire intitulé "' . $this->project->title . '" a été rejeté.')
-            ->line('Motif du rejet : ' . ($this->reason ?? 'Non spécifié.'))
-            ->line('Vous pouvez soumettre à nouveau votre projet après correction.')
-            ->action('Voir vos projets', url('/projects'))
-            ->line('Merci de votre compréhension.');
+            ->subject('Your temporary project has been rejected')
+            ->greeting('Hello ' . $notifiable->name . ',')
+            ->line('We inform you that your temporary project titled "' . $this->project->title . '" has been rejected.')
+            ->line('Rejection reason: ' . ($this->reason ?? 'Not specified.'))
+            ->line('You can resubmit your project after correction.')
+            ->action('View your projects', url('/projects'))
+            ->line('Thank you for your understanding.');
     }
 
-    /**
-     * FCM mobile push notification.
-     */
     public function toFcm($notifiable)
     {
         return [
@@ -69,6 +56,11 @@ class TempProjectRejected extends Notification
                 'type'      => 'temp_project_rejected',
                 'project_id'=> $this->project->id,
                 'reason'    => $this->reason,
+                'title_en' => 'Project Rejected',
+                'title_fr' => 'Projet rejeté',
+                'message_en' => 'Your temporary project "' . $this->project->title . '" has been rejected.',
+                'message_fr' => 'Votre projet temporaire "' . $this->project->title . '" a été rejeté.',
+                'project_title' => $this->project->title,
             ],
         ];
     }

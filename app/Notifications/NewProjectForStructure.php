@@ -9,7 +9,6 @@ use App\Notifications\Channels\FcmChannel;
 
 class NewProjectForStructure extends Notification
 {
-
     public Experience $experience;
 
     public function __construct(Experience $experience)
@@ -25,17 +24,20 @@ class NewProjectForStructure extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'Nouveau projet ajouté',
-            'message' => 'Un nouveau projet concernant votre structure a été ajouté. Veuillez le vérifier.',
+            'title_en' => 'New Project Added',
+            'title_fr' => 'Nouveau projet ajouté',
+            'message_en' => 'A new project concerning your structure has been added. Please verify it.',
+            'message_fr' => 'Un nouveau projet concernant votre structure a été ajouté. Veuillez le vérifier.',
             'temp_project_id' => $this->experience->temp_project_id,
+            'type' => 'new_project',
         ];
     }
 
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Nouveau projet pour votre structure')
-            ->line('Un nouveau projet concernant votre structure a été ajouté.');
+            ->subject('New project for your structure')
+            ->line('A new project concerning your structure has been added.');
     }
 
     public function toFcm($notifiable)
@@ -46,6 +48,10 @@ class NewProjectForStructure extends Notification
             'data' => [
                 'type' => 'new_project',
                 'temp_project_id' => $this->experience->temp_project_id,
+                'title_en' => 'New Project Added',
+                'title_fr' => 'Nouveau projet ajouté',
+                'message_en' => 'A new project concerning your structure has been added. Please verify it.',
+                'message_fr' => 'Un nouveau projet concernant votre structure a été ajouté. Veuillez le vérifier.',
             ],
         ];
     }

@@ -12,50 +12,38 @@ class TempProjectVerified extends Notification
     protected TemporaryProject $tempProject;
     protected int $officialId;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct(TemporaryProject $tempProject, int $officialId)
     {
         $this->tempProject = $tempProject;
         $this->officialId = $officialId;
     }
 
-    /**
-     * Notification delivery channels.
-     */
     public function via($notifiable): array
     {
         return ['mail', 'database', FcmChannel::class];
     }
 
-    /**
-     * Email representation.
-     */
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Projet temporaire validé')
-            ->line("Le projet temporaire « {$this->tempProject->title} » a été validé.")
-            ->line("ID officiel : {$this->officialId}");
+            ->subject('Temporary project validated')
+            ->line("The temporary project « {$this->tempProject->title} » has been validated.")
+            ->line("Official ID: {$this->officialId}");
     }
 
-    /**
-     * Array representation (database).
-     */
     public function toArray($notifiable): array
     {
         return [
-            'title' => 'Projet temporaire validé',
-            'message' => "Le projet « {$this->tempProject->title} » a été validé.",
+            'title_en' => 'Temporary Project Validated',
+            'title_fr' => 'Projet temporaire validé',
+            'message_en' => "The project « {$this->tempProject->title} » has been validated. ID: {$this->officialId}",
+            'message_fr' => "Le projet « {$this->tempProject->title} » a été validé. ID : {$this->officialId}",
             'temporary_project_id' => $this->tempProject->id,
             'official_id' => $this->officialId,
+            'type' => 'temp_project_verified',
         ];
     }
 
-    /**
-     * FCM push notification payload.
-     */
     public function toFcm($notifiable): array
     {
         return [
@@ -65,6 +53,11 @@ class TempProjectVerified extends Notification
                 'type' => 'temp_project_verified',
                 'temporary_project_id' => $this->tempProject->id,
                 'official_id' => $this->officialId,
+                'title_en' => 'Temporary Project Validated',
+                'title_fr' => 'Projet temporaire validé',
+                'message_en' => "The project « {$this->tempProject->title} » has been validated.",
+                'message_fr' => "Le projet « {$this->tempProject->title} » a été validé.",
+                'project_title' => $this->tempProject->title, // Keep original for reference
             ],
         ];
     }
