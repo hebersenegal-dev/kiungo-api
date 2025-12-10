@@ -65,6 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'temporary_structure_id',
         'profile_picture',
         'social_medias',
+        'locale',
     ];
 
     protected $hidden = ['password'];

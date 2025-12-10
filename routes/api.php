@@ -25,12 +25,40 @@ Route::get('/login', function () {
 });
 Route::post('/contact', [ContactFormController::class, 'sendContactEmail']);
 
+// In routes/api.php
 Route::post('/update-fcm-token', function (Request $request) {
+    $request->validate([
+        'fcm_token' => 'required|string',
+        'locale' => 'sometimes|string|in:en,fr',
+        'device_type' => 'sometimes|string',
+        'app_version' => 'sometimes|string',
+    ]);
+
     $user = $request->user();
     $user->fcm_token = $request->fcm_token;
+
+    // Update locale if provided
+    if ($request->has('locale')) {
+        $user->locale = $request->locale;
+    }
+
+    // Optional: Save device info
+    if ($request->has('device_type')) {
+        $user->device_type = $request->device_type;
+    }
+
+    if ($request->has('app_version')) {
+        $user->app_version = $request->app_version;
+    }
+
+    $user->fcm_token_updated_at = now();
     $user->save();
 
-    return response()->json(['message' => 'Token updated']);
+    return response()->json([
+        'message' => 'Token updated',
+        'locale' => $user->locale ?? 'fr',
+        'updated_at' => $user->fcm_token_updated_at,
+    ]);
 })->middleware('auth:sanctum');
 
 Route::post('/send-otp', [PasswordResetController::class, 'sendOtp']);
