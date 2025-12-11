@@ -22,7 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
           // Check if is_verified changed to true
           if ($user->isDirty('is_verified') && $user->is_verified) {
               // Send UserActivated notification
-              $user->notify(new UserActivated());
+              $user->notify(new UserActivated($user->locale));;
 
               // If structure, notify creator
               if ($user->role === 'structure' && $user->temporary_structure_id) {
