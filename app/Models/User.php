@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
                   if ($tempStructure && $tempStructure->added_by) {
                       $creator = User::find($tempStructure->added_by);
                       if ($creator) {
-                          $creator->notify(new TempStructureVerified());
+                          $creator->notify(new TempStructureVerified($creator->locale));
                       }
                   }
               }

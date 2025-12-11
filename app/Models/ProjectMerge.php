@@ -68,7 +68,7 @@ class ProjectMerge extends Model
          }
 
          // Notify using mail + database + FCM
-         $user->notify(new TempProjectVerified($tempProject, $merge->official_id));
+         $user->notify(new TempProjectVerified($tempProject, $merge->official_id, $user->locale));
      });
  }
 

@@ -124,12 +124,16 @@ class ProjectMergeController extends Controller
 
         // Notify the creator if exists
         if ($creator) {
-            $creator->notify(new \App\Notifications\TempProjectRejected($temp, $reason));
+          $creator->notify(new \App\Notifications\TempProjectRejected(
+    $temp,
+    $reason,
+    $creator->locale
+));
         }
 
         return response()->json([
             'message' => 'Le projet temporaire a été rejeté et supprimé avec succès.',
-            'notified_user' => $creator ? $creator->email : null, // ✅ optional, for info
+            'notified_user' => $creator ? $creator->email : null, 
         ]);
     }
 
