@@ -60,8 +60,8 @@ class TempProjectVerified extends Notification
         return [
             'title_en' => 'Temporary Project Validated',
             'title_fr' => 'Projet temporaire validé',
-            'message_en' => "The project « {$this->tempProject->title} » has been validated. ID: {$this->officialId}",
-            'message_fr' => "Le projet « {$this->tempProject->title} » a été validé. ID : {$this->officialId}",
+            'message_en' => "The project « {$this->tempProject->title} » has been validated.",
+            'message_fr' => "Le projet « {$this->tempProject->title} » a été validé. ID.",
             'temporary_project_id' => $this->tempProject->id,
             'official_id' => $this->officialId,
             'project_title' => $this->tempProject->title,

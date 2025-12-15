@@ -17,26 +17,31 @@ class User extends Authenticatable implements MustVerifyEmail
   use HasFactory, Notifiable, HasApiTokens;
 
   protected static function booted()
-  {
-      static::updated(function ($user) {
-          // Check if is_verified changed to true
-          if ($user->isDirty('is_verified') && $user->is_verified) {
-              // Send UserActivated notification
-              $user->notify(new UserActivated($user->locale));;
+{
+    static::updated(function ($user) {
+        // Check if is_verified changed to true
+        if ($user->isDirty('is_verified') && $user->is_verified) {
+            // Send UserActivated notification
+            $user->notify(new UserActivated($user->locale));
 
-              // If structure, notify creator
-              if ($user->role === 'structure' && $user->temporary_structure_id) {
-                  $tempStructure = $user->temporaryStructure;
-                  if ($tempStructure && $tempStructure->added_by) {
-                      $creator = User::find($tempStructure->added_by);
-                      if ($creator) {
-                          $creator->notify(new TempStructureVerified($creator->locale));
-                      }
-                  }
-              }
-          }
-      });
-  }
+            // If structure, notify creator
+            if ($user->role === 'structure' && $user->temporary_structure_id) {
+                $tempStructure = $user->temporaryStructure;
+                if ($tempStructure && $tempStructure->added_by) {
+                    $creator = User::find($tempStructure->added_by);
+                    if ($creator) {
+                        // Pass structure ID and name to the notification
+                        $creator->notify(new TempStructureVerified(
+                            $user->id, // structure ID (now the verified user's ID)
+                            $user->name, // structure name
+                            $creator->locale // creator's locale
+                        ));
+                    }
+                }
+            }
+        }
+    });
+}
 
 
   public function sendPasswordResetNotification($token)
