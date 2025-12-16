@@ -89,6 +89,7 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [UserController::class, 'show']);
     Route::put('/me', [UserController::class, 'updateMe']);
     Route::post('/{id}/verify', [UserController::class, 'verifyUser']);
+    Route::post('/update-locale', [UserController::class, 'updateLocale']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

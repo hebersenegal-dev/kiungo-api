@@ -220,4 +220,28 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
+
+    
+  public function updateLocale(Request $request)
+  {
+      $request->validate([
+          'locale' => 'required|string|in:en,fr',
+      ]);
+
+      $user = Auth::user();
+
+      if (!$user) {
+          return response()->json(['error' => 'Unauthenticated'], 401);
+      }
+
+      // Update user's locale
+      $user->locale = $request->locale;
+      $user->save();
+
+      return response()->json([
+          'message' => 'Locale updated successfully',
+          'locale' => $user->locale,
+      ]);
+  }
+
 }
